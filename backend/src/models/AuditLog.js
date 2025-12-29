@@ -9,11 +9,11 @@ const AuditLog = sequelize.define('AuditLog', {
   },
   userId: {
     type: DataTypes.UUID,
-    references: { model: 'Users', key: 'id' }
+    references: { model: 'users', key: 'id' }
   },
   companyId: {
     type: DataTypes.UUID,
-    references: { model: 'Companies', key: 'id' }
+    references: { model: 'companies', key: 'id' }
   },
   module: {
     type: DataTypes.STRING,
@@ -41,14 +41,17 @@ const AuditLog = sequelize.define('AuditLog', {
   },
   userAgent: {
     type: DataTypes.TEXT
+  },
+  description: {
+    type: DataTypes.TEXT
   }
 }, {
   tableName: 'audit_logs',
   indexes: [
-    { fields: ['userId'] },
-    { fields: ['companyId'] },
+    { fields: ['user_id'] },
+    { fields: ['company_id'] },
     { fields: ['module'] },
-    { fields: ['createdAt'] }
+    { fields: ['created_at'] }
   ]
 });
 

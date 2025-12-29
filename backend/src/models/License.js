@@ -10,7 +10,7 @@ const License = sequelize.define('License', {
   companyId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Companies', key: 'id' }
+    references: { model: 'companies', key: 'id' }
   },
   moduleName: {
     type: DataTypes.STRING,

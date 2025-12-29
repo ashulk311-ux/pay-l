@@ -45,6 +45,38 @@ exports.getAllEmployees = async (req, res) => {
 
     const { count, rows } = await Employee.findAndCountAll({
       where: whereClause,
+      // Exclude non-existent columns - only query fields that exist in DB
+      attributes: {
+        exclude: [
+          'positionId', 'employeeType', 'salutation', 'middleName', 'fatherHusbandName', 'motherName',
+          'officePhone', 'residencePhone', 'mobileNo', 'personalMailId', 'passportNo', 'passportIssueOffice',
+          'passportIssueDate', 'passportExpiryDate', 'passportApplicable', 'emergencyContactName',
+          'emergencyContactRelationship', 'emergencyContactAddress', 'emergencyContactEmail',
+          'emergencyContactLandline', 'emergencyContactMobile', 'gender', 'appointmentLetterDate',
+          'confirmationDate', 'joiningDateForForm5', 'gratuityDate', 'dateOfPromotion', 'dateOfTransfer',
+          'contractStartDate', 'contractEndDate', 'dateOfRegularization', 'leavingDate', 'leavingDateForForm10',
+          'settlementDate', 'ctcAmount', 'ctcCurrency', 'effectiveFrom', 'leaveAssignDate', 'leaveTemplate',
+          'oldEmployeeCode', 'officialMailId', 'noticeDays', 'expat', 'costCenterId', 'unitId', 'gradeId',
+          'levelId', 'subDepartmentId', 'category', 'reportingManagerId', 'reportingHrId', 'staffId',
+          'currentAddress1', 'currentAddress2', 'currentCountry', 'currentState', 'currentCity', 'currentZip',
+          'permanentAddress1', 'permanentAddress2', 'permanentCountry', 'permanentState', 'permanentCity',
+          'permanentZip', 'sameAsCurrentAddress', 'nationality', 'maritalStatus', 'dateOfMarriage',
+          'spouseName', 'spouseDateOfBirth', 'totalNumberOfChildren', 'totalNumberOfSchoolGoingChildren',
+          'numberOfDependentsApartFromChildren', 'totalNumberOfChildrenInHostel', 'totalDependent',
+          'nameOfDependentsApartFromSpouseChildren', 'familyDetails', 'firstNomineeName', 'firstNomineeRelation',
+          'parentMediclaim', 'considerAsDirector', 'field1', 'field3', 'field4', 'field5', 'field6',
+          'religionName', 'identificationMark', 'hobbies', 'billable', 'statusDomicile', 'bloodGroup',
+          'severeDisability', 'severeDisabilityDetails', 'severeDisabilityBasedOnAttendance', 'skillSet',
+          'pfContribution', 'vpfContribution', 'pfNo', 'pfBasicGrossWages', 'pensionLimit', 'pension',
+          'customizedPfOption', 'customizedEsiOption', 'contributeEsiOnOt', 'esiContribution', 'esiNo',
+          'dispensaryName', 'labourWelfareFundContribution', 'customizedLwfOption', 'otPartOfGross',
+          'customizedOtPartOfGross', 'customizedEsiContributionOnOt', 'qualifications', 'previousWorkExperience',
+          'totalExperienceYears', 'totalExperienceMonths', 'totalExperienceNotRelevantToJobYears',
+          'totalExperienceNotRelevantToJobMonths', 'resume', 'pfUan', 'drivingLicence', 'drivingLicenceExpiryDate',
+          'voterId', 'rationCard', 'projectDone', 'finalized', 'suspended', 'projectIncomeTillDate',
+          'reasonForLeaving', 'leavingReasonPfEcrFile'
+        ]
+      },
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['createdAt', 'DESC']]
@@ -72,6 +104,38 @@ exports.getAllEmployees = async (req, res) => {
 exports.getEmployee = async (req, res) => {
   try {
     const employee = await Employee.findByPk(req.params.id, {
+      // Exclude non-existent columns - only query fields that exist in DB
+      attributes: {
+        exclude: [
+          'positionId', 'employeeType', 'salutation', 'middleName', 'fatherHusbandName', 'motherName',
+          'officePhone', 'residencePhone', 'mobileNo', 'personalMailId', 'passportNo', 'passportIssueOffice',
+          'passportIssueDate', 'passportExpiryDate', 'passportApplicable', 'emergencyContactName',
+          'emergencyContactRelationship', 'emergencyContactAddress', 'emergencyContactEmail',
+          'emergencyContactLandline', 'emergencyContactMobile', 'gender', 'appointmentLetterDate',
+          'confirmationDate', 'joiningDateForForm5', 'gratuityDate', 'dateOfPromotion', 'dateOfTransfer',
+          'contractStartDate', 'contractEndDate', 'dateOfRegularization', 'leavingDate', 'leavingDateForForm10',
+          'settlementDate', 'ctcAmount', 'ctcCurrency', 'effectiveFrom', 'leaveAssignDate', 'leaveTemplate',
+          'oldEmployeeCode', 'officialMailId', 'noticeDays', 'expat', 'costCenterId', 'unitId', 'gradeId',
+          'levelId', 'subDepartmentId', 'category', 'reportingManagerId', 'reportingHrId', 'staffId',
+          'currentAddress1', 'currentAddress2', 'currentCountry', 'currentState', 'currentCity', 'currentZip',
+          'permanentAddress1', 'permanentAddress2', 'permanentCountry', 'permanentState', 'permanentCity',
+          'permanentZip', 'sameAsCurrentAddress', 'nationality', 'maritalStatus', 'dateOfMarriage',
+          'spouseName', 'spouseDateOfBirth', 'totalNumberOfChildren', 'totalNumberOfSchoolGoingChildren',
+          'numberOfDependentsApartFromChildren', 'totalNumberOfChildrenInHostel', 'totalDependent',
+          'nameOfDependentsApartFromSpouseChildren', 'familyDetails', 'firstNomineeName', 'firstNomineeRelation',
+          'parentMediclaim', 'considerAsDirector', 'field1', 'field3', 'field4', 'field5', 'field6',
+          'religionName', 'identificationMark', 'hobbies', 'billable', 'statusDomicile', 'bloodGroup',
+          'severeDisability', 'severeDisabilityDetails', 'severeDisabilityBasedOnAttendance', 'skillSet',
+          'pfContribution', 'vpfContribution', 'pfNo', 'pfBasicGrossWages', 'pensionLimit', 'pension',
+          'customizedPfOption', 'customizedEsiOption', 'contributeEsiOnOt', 'esiContribution', 'esiNo',
+          'dispensaryName', 'labourWelfareFundContribution', 'customizedLwfOption', 'otPartOfGross',
+          'customizedOtPartOfGross', 'customizedEsiContributionOnOt', 'qualifications', 'previousWorkExperience',
+          'totalExperienceYears', 'totalExperienceMonths', 'totalExperienceNotRelevantToJobYears',
+          'totalExperienceNotRelevantToJobMonths', 'resume', 'pfUan', 'drivingLicence', 'drivingLicenceExpiryDate',
+          'voterId', 'rationCard', 'projectDone', 'finalized', 'suspended', 'projectIncomeTillDate',
+          'reasonForLeaving', 'leavingReasonPfEcrFile'
+        ]
+      },
       include: [
         { model: Company, as: 'company', attributes: ['id', 'name', 'code'] }
       ]
@@ -102,7 +166,37 @@ exports.getEmployee = async (req, res) => {
  */
 exports.createEmployee = async (req, res) => {
   try {
-    const employeeData = req.body;
+    // Remove non-existent columns if present (keep only fields that exist in DB)
+    const { 
+      positionId, employeeType, salutation, middleName, fatherHusbandName, motherName,
+      officePhone, residencePhone, mobileNo, personalMailId, passportNo, passportIssueOffice,
+      passportIssueDate, passportExpiryDate, passportApplicable, emergencyContactName,
+      emergencyContactRelationship, emergencyContactAddress, emergencyContactEmail,
+      emergencyContactLandline, emergencyContactMobile, gender, appointmentLetterDate,
+      confirmationDate, joiningDateForForm5, gratuityDate, dateOfPromotion, dateOfTransfer,
+      contractStartDate, contractEndDate, dateOfRegularization, leavingDate, leavingDateForForm10,
+      settlementDate, ctcAmount, ctcCurrency, effectiveFrom, leaveAssignDate, leaveTemplate,
+      oldEmployeeCode, officialMailId, noticeDays, expat, costCenterId, unitId, gradeId,
+      levelId, subDepartmentId, category, reportingManagerId, reportingHrId, staffId,
+      currentAddress1, currentAddress2, currentCountry, currentState, currentCity, currentZip,
+      permanentAddress1, permanentAddress2, permanentCountry, permanentState, permanentCity,
+      permanentZip, sameAsCurrentAddress, nationality, maritalStatus, dateOfMarriage,
+      spouseName, spouseDateOfBirth, totalNumberOfChildren, totalNumberOfSchoolGoingChildren,
+      numberOfDependentsApartFromChildren, totalNumberOfChildrenInHostel, totalDependent,
+      nameOfDependentsApartFromSpouseChildren, familyDetails, firstNomineeName, firstNomineeRelation,
+      parentMediclaim, considerAsDirector, field1, field3, field4, field5, field6,
+      religionName, identificationMark, hobbies, billable, statusDomicile, bloodGroup,
+      severeDisability, severeDisabilityDetails, severeDisabilityBasedOnAttendance, skillSet,
+      pfContribution, vpfContribution, pfNo, pfBasicGrossWages, pensionLimit, pension,
+      customizedPfOption, customizedEsiOption, contributeEsiOnOt, esiContribution, esiNo,
+      dispensaryName, labourWelfareFundContribution, customizedLwfOption, otPartOfGross,
+      customizedOtPartOfGross, customizedEsiContributionOnOt, qualifications, previousWorkExperience,
+      totalExperienceYears, totalExperienceMonths, totalExperienceNotRelevantToJobYears,
+      totalExperienceNotRelevantToJobMonths, resume, pfUan, drivingLicence, drivingLicenceExpiryDate,
+      voterId, rationCard, projectDone, finalized, suspended, projectIncomeTillDate,
+      reasonForLeaving, leavingReasonPfEcrFile,
+      ...employeeData 
+    } = req.body;
 
     // Validate employee data
     const validation = employeeService.validateEmployeeData(employeeData);
@@ -200,7 +294,11 @@ exports.createEmployee = async (req, res) => {
  */
 exports.updateEmployee = async (req, res) => {
   try {
-    const employee = await Employee.findByPk(req.params.id);
+    const employee = await Employee.findByPk(req.params.id, {
+      attributes: {
+        exclude: ['positionId'] // Exclude non-existent column
+      }
+    });
     if (!employee) {
       return res.status(404).json({ success: false, message: 'Employee not found' });
     }
@@ -222,8 +320,39 @@ exports.updateEmployee = async (req, res) => {
       }
     }
 
+    // Remove non-existent columns if present (keep only fields that exist in DB)
+    const { 
+      positionId, employeeType, salutation, middleName, fatherHusbandName, motherName,
+      officePhone, residencePhone, mobileNo, personalMailId, passportNo, passportIssueOffice,
+      passportIssueDate, passportExpiryDate, passportApplicable, emergencyContactName,
+      emergencyContactRelationship, emergencyContactAddress, emergencyContactEmail,
+      emergencyContactLandline, emergencyContactMobile, gender, appointmentLetterDate,
+      confirmationDate, joiningDateForForm5, gratuityDate, dateOfPromotion, dateOfTransfer,
+      contractStartDate, contractEndDate, dateOfRegularization, leavingDate, leavingDateForForm10,
+      settlementDate, ctcAmount, ctcCurrency, effectiveFrom, leaveAssignDate, leaveTemplate,
+      oldEmployeeCode, officialMailId, noticeDays, expat, costCenterId, unitId, gradeId,
+      levelId, subDepartmentId, category, reportingManagerId, reportingHrId, staffId,
+      currentAddress1, currentAddress2, currentCountry, currentState, currentCity, currentZip,
+      permanentAddress1, permanentAddress2, permanentCountry, permanentState, permanentCity,
+      permanentZip, sameAsCurrentAddress, nationality, maritalStatus, dateOfMarriage,
+      spouseName, spouseDateOfBirth, totalNumberOfChildren, totalNumberOfSchoolGoingChildren,
+      numberOfDependentsApartFromChildren, totalNumberOfChildrenInHostel, totalDependent,
+      nameOfDependentsApartFromSpouseChildren, familyDetails, firstNomineeName, firstNomineeRelation,
+      parentMediclaim, considerAsDirector, field1, field3, field4, field5, field6,
+      religionName, identificationMark, hobbies, billable, statusDomicile, bloodGroup,
+      severeDisability, severeDisabilityDetails, severeDisabilityBasedOnAttendance, skillSet,
+      pfContribution, vpfContribution, pfNo, pfBasicGrossWages, pensionLimit, pension,
+      customizedPfOption, customizedEsiOption, contributeEsiOnOt, esiContribution, esiNo,
+      dispensaryName, labourWelfareFundContribution, customizedLwfOption, otPartOfGross,
+      customizedOtPartOfGross, customizedEsiContributionOnOt, qualifications, previousWorkExperience,
+      totalExperienceYears, totalExperienceMonths, totalExperienceNotRelevantToJobYears,
+      totalExperienceNotRelevantToJobMonths, resume, pfUan, drivingLicence, drivingLicenceExpiryDate,
+      voterId, rationCard, projectDone, finalized, suspended, projectIncomeTillDate,
+      reasonForLeaving, leavingReasonPfEcrFile,
+      ...updateData 
+    } = req.body;
     // Update employee
-    await employee.update(req.body);
+    await employee.update(updateData);
 
     // Recheck KYC status after update
     const kycStatus = employeeService.checkKYCStatus(employee);
@@ -291,7 +420,11 @@ exports.uploadDocument = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
-    const employee = await Employee.findByPk(id);
+    const employee = await Employee.findByPk(id, {
+      attributes: {
+        exclude: ['positionId'] // Exclude non-existent column
+      }
+    });
     if (!employee) {
       return res.status(404).json({ success: false, message: 'Employee not found' });
     }
@@ -391,7 +524,11 @@ exports.verifyKYC = async (req, res) => {
       });
     }
 
-    const employee = await Employee.findByPk(id);
+    const employee = await Employee.findByPk(id, {
+      attributes: {
+        exclude: ['positionId'] // Exclude non-existent column
+      }
+    });
     if (!employee) {
       return res.status(404).json({ success: false, message: 'Employee not found' });
     }

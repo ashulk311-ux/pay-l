@@ -9,6 +9,14 @@ exports.getDashboardAnalytics = async (req, res) => {
   try {
     const companyId = req.user.companyId;
 
+    // Validate companyId exists
+    if (!companyId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'User must be associated with a company to view dashboard analytics' 
+      });
+    }
+
     // Get employees by department
     const employees = await Employee.findAll({
       where: { companyId, isActive: true },
@@ -139,7 +147,14 @@ exports.getDashboardAnalytics = async (req, res) => {
     });
   } catch (error) {
     logger.error('Get dashboard analytics error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch dashboard analytics', error: error.message });
+    logger.error('Error stack:', error.stack);
+    logger.error('User info:', { userId: req.user?.id, companyId: req.user?.companyId, role: req.user?.role?.name });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch dashboard analytics', 
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 

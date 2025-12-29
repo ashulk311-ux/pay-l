@@ -10,12 +10,12 @@ const Payslip = sequelize.define('Payslip', {
   payrollId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Payrolls', key: 'id' }
+    references: { model: 'payrolls', key: 'id' }
   },
   employeeId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Employees', key: 'id' }
+    references: { model: 'employees', key: 'id' }
   },
   month: {
     type: DataTypes.INTEGER,
@@ -63,6 +63,10 @@ const Payslip = sequelize.define('Payslip', {
   },
   distributedAt: {
     type: DataTypes.DATE
+  },
+  isManualOverride: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 }, {
   tableName: 'payslips'

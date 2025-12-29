@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -16,8 +16,20 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
+
+  // Redirect after login based on user role
+  useEffect(() => {
+    if (user) {
+      const userRole = user.role?.name;
+      if (userRole === 'Employee') {
+        navigate('/portal', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,10 +38,9 @@ export default function Login() {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      // Navigation will happen via useEffect when user is set
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
-    } finally {
       setLoading(false);
     }
   };

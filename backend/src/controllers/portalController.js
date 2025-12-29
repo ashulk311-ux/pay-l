@@ -1,4 +1,4 @@
-const { Employee, Payslip, Payroll, Attendance, Leave, SalaryStructure, GlobalPolicy } = require('../models');
+const { Employee, Payslip, Payroll, Attendance, Leave, SalaryStructure, GlobalPolicy, ITDeclaration } = require('../models');
 const { Op } = require('sequelize');
 const logger = require('../utils/logger');
 const { createAuditLog } = require('../utils/auditLogger');
@@ -248,10 +248,10 @@ async function calculateLeaveBalance(employeeId) {
 
     // Get leave policy from global policy
     const policy = await GlobalPolicy.findOne({
-      where: { companyId: employee.companyId, policyType: 'leave' }
+      where: { companyId: employee.companyId, moduleName: 'leave' }
     });
 
-    const leaveAllocation = policy?.configuration?.leaveAllocation || {
+    const leaveAllocation = policy?.settings?.leaveAllocation || {
       CL: 12,
       SL: 12,
       PL: 0,
@@ -492,15 +492,29 @@ exports.getITDeclaration = async (req, res) => {
     }
     const employeeId = employee.id;
 
-    const salaryStructure = await SalaryStructure.findOne({
-      where: { employeeId, isActive: true }
+    // First try to get from ITDeclaration table
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    const financialYear = currentMonth >= 4 ? `${currentYear}-${currentYear + 1}` : `${currentYear - 1}-${currentYear}`;
+
+    let itDeclaration = await ITDeclaration.findOne({
+      where: {
+        employeeId,
+        financialYear
+      }
     });
 
-    if (!salaryStructure) {
-      return res.status(404).json({ success: false, message: 'Salary structure not found' });
-    }
+    // If not found in ITDeclaration table, check salary structure
+    if (!itDeclaration) {
+      const salaryStructure = await SalaryStructure.findOne({
+        where: { employeeId, isActive: true }
+      });
 
-    const itDeclaration = salaryStructure.extraFields?.itDeclaration || null;
+      if (salaryStructure && salaryStructure.extraFields?.itDeclaration) {
+        itDeclaration = salaryStructure.extraFields.itDeclaration;
+      }
+    }
 
     res.json({
       success: true,
@@ -509,6 +523,26 @@ exports.getITDeclaration = async (req, res) => {
   } catch (error) {
     logger.error('Get IT declaration error:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch IT declaration', error: error.message });
+  }
+};
+
+/**
+ * Get employee profile
+ */
+exports.getProfile = async (req, res) => {
+  try {
+    const employee = await getEmployeeByUser(req.user);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Employee record not found for this user' });
+    }
+
+    res.json({
+      success: true,
+      data: employee
+    });
+  } catch (error) {
+    logger.error('Get profile error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch profile', error: error.message });
   }
 };
 
@@ -556,6 +590,52 @@ exports.updateProfile = async (req, res) => {
 };
 
 /**
+ * Get helpdesk queries
+ */
+exports.getQueries = async (req, res) => {
+  try {
+    const employee = await getEmployeeByUser(req.user);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Employee record not found for this user' });
+    }
+    const employeeId = employee.id;
+
+    // Get queries from audit logs (temporary solution until proper helpdesk model is created)
+    const AuditLog = require('../models').AuditLog;
+    const { getPaginationParams, createPaginatedResponse } = require('../utils/pagination');
+    const { page, limit, offset } = getPaginationParams(req, { defaultLimit: 20, maxLimit: 100 });
+    
+    const { count, rows: queries } = await AuditLog.findAndCountAll({
+      where: {
+        userId: req.user.id,
+        module: 'helpdesk',
+        entityType: 'Helpdesk'
+      },
+      order: [['createdAt', 'DESC']],
+      limit,
+      offset
+    });
+
+    // Transform audit logs to query format
+    const queryData = queries.map(log => ({
+      id: log.id,
+      ticketId: `TKT-${log.id.toString().slice(-6).toUpperCase()}`,
+      subject: log.metadata?.subject || 'N/A',
+      description: log.description || '',
+      category: log.metadata?.category || 'other',
+      status: log.metadata?.status || 'open',
+      createdAt: log.createdAt,
+      updatedAt: log.updatedAt
+    }));
+
+    res.json(createPaginatedResponse(queryData, count, page, limit));
+  } catch (error) {
+    logger.error('Get queries error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch queries', error: error.message });
+  }
+};
+
+/**
  * Raise helpdesk query
  */
 exports.raiseQuery = async (req, res) => {
@@ -572,16 +652,16 @@ exports.raiseQuery = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Subject and description are required' });
     }
 
-    // TODO: Implement helpdesk/ticket system
-    // For now, create an audit log entry
+    // Create an audit log entry for the helpdesk query
     await createAuditLog({
       userId: req.user.id,
+      companyId: req.user.companyId,
       action: 'create',
       entityType: 'Helpdesk',
       entityId: employeeId,
       module: 'helpdesk',
       description: `Helpdesk query: ${subject} - ${description}`,
-      metadata: { category, subject, description }
+      metadata: { category, subject, description, status: 'open' }
     });
 
     res.json({

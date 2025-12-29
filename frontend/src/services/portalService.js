@@ -53,8 +53,18 @@ export const portalService = {
     return response.data;
   },
 
+  getProfile: async () => {
+    const response = await api.get('/portal/profile');
+    return response.data;
+  },
+
   updateProfile: async (data) => {
     const response = await api.put('/portal/profile', data);
+    return response.data;
+  },
+
+  getQueries: async () => {
+    const response = await api.get('/portal/helpdesk');
     return response.data;
   },
 

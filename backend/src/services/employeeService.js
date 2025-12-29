@@ -10,27 +10,26 @@ const logger = require('../utils/logger');
  */
 async function generateEmployeeCode(companyId, employeeData = {}) {
   try {
-    // Get company's employee code generation policy
-    const globalPolicy = await GlobalPolicy.findOne({
-      where: { companyId, key: 'employee_code_generation' }
-    });
-
-    let codeFormat = 'AUTO'; // AUTO, MANUAL, PREFIX_SEQUENCE, etc.
-    let prefix = '';
-    let sequenceLength = 4;
-
-    if (globalPolicy && globalPolicy.value) {
-      const policy = typeof globalPolicy.value === 'string' 
-        ? JSON.parse(globalPolicy.value) 
-        : globalPolicy.value;
-      codeFormat = policy.format || 'AUTO';
-      prefix = policy.prefix || '';
-      sequenceLength = policy.sequenceLength || 4;
+    // Get company's employee code generation settings
+    const company = await Company.findByPk(companyId);
+    if (!company) {
+      throw new Error('Company not found');
     }
 
+    const mode = company.employeeCodeGenerationMode || 'manual';
+    const prefix = company.employeeCodePrefix || 'EMP';
+    const format = company.employeeCodeFormat || '{PREFIX}{NUMBER}';
+
     // If manual, return null (code must be provided)
-    if (codeFormat === 'MANUAL') {
+    if (mode === 'manual') {
       return null;
+    }
+
+    // If matrix integration, fetch from Matrix API
+    if (mode === 'matrix' && company.matrixSoftwareIntegration) {
+      // TODO: Integrate with Matrix Software API
+      // For now, fall back to auto generation
+      logger.warn('Matrix integration not implemented, falling back to auto generation');
     }
 
     // Get the last employee code for sequence generation
@@ -42,57 +41,28 @@ async function generateEmployeeCode(companyId, employeeData = {}) {
 
     let newCode = '';
 
-    switch (codeFormat) {
-      case 'PREFIX_SEQUENCE':
-        // Format: PREFIX + SEQUENCE (e.g., EMP0001, EMP0002)
-        const lastSequence = lastEmployee 
-          ? parseInt(lastEmployee.employeeCode.replace(prefix, '')) || 0 
-          : 0;
-        const nextSequence = lastSequence + 1;
-        newCode = prefix + String(nextSequence).padStart(sequenceLength, '0');
-        break;
+    // Parse format string (e.g., "{PREFIX}{NUMBER}", "{PREFIX}{YEAR}{NUMBER}")
+    const currentYear = new Date().getFullYear();
+    const year = String(currentYear);
+    
+    // Get next sequence number
+    const yearEmployees = await Employee.count({
+      where: {
+        companyId,
+        dateOfJoining: {
+          [Op.gte]: new Date(currentYear, 0, 1)
+        }
+      }
+    });
+    const nextNumber = yearEmployees + 1;
+    const paddedNumber = String(nextNumber).padStart(4, '0');
 
-      case 'DEPARTMENT_CODE':
-        // Format: DEPT + SEQUENCE (e.g., HR001, IT001)
-        const deptPrefix = (employeeData.department || 'EMP').substring(0, 2).toUpperCase();
-        const deptEmployees = await Employee.count({
-          where: {
-            companyId,
-            department: employeeData.department
-          }
-        });
-        newCode = deptPrefix + String(deptEmployees + 1).padStart(sequenceLength, '0');
-        break;
-
-      case 'YEAR_SEQUENCE':
-        // Format: YEAR + SEQUENCE (e.g., 2024001, 2024002)
-        const currentYear = new Date().getFullYear();
-        const yearEmployees = await Employee.count({
-          where: {
-            companyId,
-            dateOfJoining: {
-              [Op.gte]: new Date(currentYear, 0, 1)
-            }
-          }
-        });
-        newCode = currentYear.toString() + String(yearEmployees + 1).padStart(sequenceLength, '0');
-        break;
-
-      case 'AUTO':
-      default:
-        // Format: EMP + YEAR + SEQUENCE (e.g., EMP2024001)
-        const year = new Date().getFullYear();
-        const autoEmployees = await Employee.count({
-          where: {
-            companyId,
-            dateOfJoining: {
-              [Op.gte]: new Date(year, 0, 1)
-            }
-          }
-        });
-        newCode = `EMP${year}${String(autoEmployees + 1).padStart(4, '0')}`;
-        break;
-    }
+    // Replace format placeholders
+    newCode = format
+      .replace(/{PREFIX}/g, prefix)
+      .replace(/{YEAR}/g, year)
+      .replace(/{NUMBER}/g, paddedNumber)
+      .replace(/{DEPARTMENT}/g, (employeeData.department || 'EMP').substring(0, 2).toUpperCase());
 
     // Ensure uniqueness
     let finalCode = newCode;

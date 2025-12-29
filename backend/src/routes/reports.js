@@ -3,6 +3,7 @@ const router = express.Router();
 const reportsController = require('../controllers/reportsController');
 const dashboardController = require('../controllers/dashboardController');
 const { authenticate, authorize } = require('../middleware/auth');
+const { protectAuditorWrite } = require('../middleware/auditorProtection');
 const path = require('path');
 const fs = require('fs');
 
@@ -33,6 +34,14 @@ router.get('/employee-history/:id', authenticate, authorize('view_reports'), rep
 
 // Audit Logs
 router.get('/audit-logs', authenticate, authorize('view_audit_logs'), reportsController.getAuditLogs);
+router.get('/audit-logs/export', authenticate, authorize('view_audit_logs'), reportsController.exportAuditLogs);
+
+// Custom Reports
+router.get('/custom', authenticate, authorize('view_reports'), reportsController.getCustomReports);
+router.post('/custom', authenticate, authorize('manage_reports'), protectAuditorWrite, reportsController.createCustomReport);
+router.put('/custom/:id', authenticate, authorize('manage_reports'), protectAuditorWrite, reportsController.updateCustomReport);
+router.delete('/custom/:id', authenticate, authorize('manage_reports'), protectAuditorWrite, reportsController.deleteCustomReport);
+router.post('/custom/:id/execute', authenticate, authorize('view_reports'), reportsController.executeCustomReport);
 
 // Download report file
 router.get('/download/*', authenticate, authorize('view_reports'), (req, res) => {

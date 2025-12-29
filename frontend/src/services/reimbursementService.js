@@ -33,14 +33,18 @@ export const reimbursementService = {
     return response.data;
   },
 
-  approve: async (id) => {
-    const response = await api.put(`/reimbursement/${id}/approve`);
+  approve: async (id, remarks) => {
+    const response = await api.put(`/reimbursement/${id}/approve`, { remarks });
     return response.data;
   },
 
-  getEmployeeReimbursements: async (employeeId) => {
-    const response = await api.get(`/reimbursement/employee/${employeeId}`);
+  reject: async (id, rejectionReason) => {
+    const response = await api.put(`/reimbursement/${id}/reject`, { rejectionReason });
+    return response.data;
+  },
+
+  getEmployeeReimbursements: async (employeeId, params = {}) => {
+    const response = await api.get(`/reimbursement/employee/${employeeId}`, { params });
     return response.data;
   }
 };
-

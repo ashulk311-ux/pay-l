@@ -25,6 +25,15 @@ const Company = sequelize.define('Company', {
   phone: {
     type: DataTypes.STRING
   },
+  website: {
+    type: DataTypes.STRING
+  },
+  contactPerson: {
+    type: DataTypes.STRING
+  },
+  contactPersonPhone: {
+    type: DataTypes.STRING
+  },
   address: {
     type: DataTypes.TEXT
   },
@@ -47,6 +56,9 @@ const Company = sequelize.define('Company', {
   gstin: {
     type: DataTypes.STRING
   },
+  // Bank Details are stored in settings.bankDetails JSON field
+  // Removed bankName, bankAccountNumber, bankBranch, bankAddress, bankIfscCode
+  // from model since columns don't exist in database
   smtpHost: {
     type: DataTypes.STRING
   },
@@ -72,7 +84,33 @@ const Company = sequelize.define('Company', {
   twilioPhoneNumber: {
     type: DataTypes.STRING
   },
+  employeeCodeGenerationMode: {
+    type: DataTypes.ENUM('manual', 'auto', 'matrix'),
+    defaultValue: 'manual'
+  },
+  employeeCodePrefix: {
+    type: DataTypes.STRING,
+    defaultValue: 'EMP'
+  },
+  employeeCodeFormat: {
+    type: DataTypes.STRING,
+    defaultValue: '{PREFIX}{NUMBER}'
+  },
+  matrixSoftwareIntegration: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  matrixApiKey: {
+    type: DataTypes.STRING
+  },
+  matrixApiUrl: {
+    type: DataTypes.STRING
+  },
   theme: {
+    type: DataTypes.JSON,
+    defaultValue: {}
+  },
+  settings: {
     type: DataTypes.JSON,
     defaultValue: {}
   },

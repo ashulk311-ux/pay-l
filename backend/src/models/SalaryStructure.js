@@ -10,7 +10,7 @@ const SalaryStructure = sequelize.define('SalaryStructure', {
   employeeId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Employees', key: 'id' }
+    references: { model: 'employees', key: 'id' }
   },
   effectiveDate: {
     type: DataTypes.DATE,
@@ -32,7 +32,19 @@ const SalaryStructure = sequelize.define('SalaryStructure', {
     type: DataTypes.JSON,
     defaultValue: {}
   },
+  fixedHeads: {
+    type: DataTypes.JSON,
+    defaultValue: {}
+  },
+  variableHeads: {
+    type: DataTypes.JSON,
+    defaultValue: {}
+  },
   deductions: {
+    type: DataTypes.JSON,
+    defaultValue: {}
+  },
+  salaryHeads: {
     type: DataTypes.JSON,
     defaultValue: {}
   },

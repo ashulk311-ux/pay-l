@@ -10,7 +10,7 @@ const Payroll = sequelize.define('Payroll', {
   companyId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Companies', key: 'id' }
+    references: { model: 'companies', key: 'id' }
   },
   month: {
     type: DataTypes.INTEGER,
@@ -30,14 +30,14 @@ const Payroll = sequelize.define('Payroll', {
   },
   processedBy: {
     type: DataTypes.UUID,
-    references: { model: 'Users', key: 'id' }
+    references: { model: 'users', key: 'id' }
   },
   processedAt: {
     type: DataTypes.DATE
   },
   finalizedBy: {
     type: DataTypes.UUID,
-    references: { model: 'Users', key: 'id' }
+    references: { model: 'users', key: 'id' }
   },
   finalizedAt: {
     type: DataTypes.DATE
@@ -57,11 +57,38 @@ const Payroll = sequelize.define('Payroll', {
   totalNetSalary: {
     type: DataTypes.DECIMAL(15, 2),
     defaultValue: 0
+  },
+  preCheckCompleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  preCheckCompletedAt: {
+    type: DataTypes.DATE
+  },
+  preCheckCompletedBy: {
+    type: DataTypes.UUID,
+    references: { model: 'users', key: 'id' }
+  },
+  earningsApplied: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  deductionsApplied: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  payslipsGenerated: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  payslipsDistributed: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 }, {
   tableName: 'payrolls',
   indexes: [
-    { fields: ['companyId', 'month', 'year'], unique: true }
+    { fields: ['company_id', 'month', 'year'], unique: true }
   ]
 });
 

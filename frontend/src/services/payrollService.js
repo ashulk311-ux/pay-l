@@ -46,6 +46,21 @@ export const payrollService = {
       responseType: 'blob'
     });
     return response.data;
+  },
+
+  runPreChecks: async (id) => {
+    const response = await api.post(`/payroll/${id}/pre-checks`);
+    return response.data;
+  },
+
+  applyEarningsDeductions: async (id) => {
+    const response = await api.post(`/payroll/${id}/apply-earnings-deductions`);
+    return response.data;
+  },
+
+  getPreChecks: async (id) => {
+    const response = await api.get(`/payroll/${id}/pre-checks`);
+    return response.data;
   }
 };
 

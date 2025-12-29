@@ -10,7 +10,7 @@ const GlobalPolicy = sequelize.define('GlobalPolicy', {
   companyId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Companies', key: 'id' }
+    references: { model: 'companies', key: 'id' }
   },
   moduleName: {
     type: DataTypes.STRING,
@@ -27,7 +27,7 @@ const GlobalPolicy = sequelize.define('GlobalPolicy', {
 }, {
   tableName: 'global_policies',
   indexes: [
-    { fields: ['companyId', 'moduleName'], unique: true }
+    { fields: ['company_id', 'module_name'], unique: true }
   ]
 });
 

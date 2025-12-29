@@ -10,7 +10,7 @@ const StatutoryConfig = sequelize.define('StatutoryConfig', {
   companyId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Companies', key: 'id' }
+    references: { model: 'companies', key: 'id' }
   },
   state: {
     type: DataTypes.STRING,
@@ -39,11 +39,19 @@ const StatutoryConfig = sequelize.define('StatutoryConfig', {
   exemptions: {
     type: DataTypes.JSON,
     defaultValue: []
+  },
+  autoDeduction: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  salaryHeadMapping: {
+    type: DataTypes.JSON,
+    defaultValue: {}
   }
 }, {
   tableName: 'statutory_configs',
   indexes: [
-    { fields: ['companyId', 'state', 'statutoryType'], unique: true }
+    { fields: ['company_id', 'state', 'statutory_type'], unique: true }
   ]
 });
 

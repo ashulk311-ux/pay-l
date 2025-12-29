@@ -10,7 +10,7 @@ const Reimbursement = sequelize.define('Reimbursement', {
   employeeId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Employees', key: 'id' }
+    references: { model: 'employees', key: 'id' }
   },
   category: {
     type: DataTypes.STRING,
@@ -37,7 +37,7 @@ const Reimbursement = sequelize.define('Reimbursement', {
   },
   approvedBy: {
     type: DataTypes.UUID,
-    references: { model: 'Users', key: 'id' }
+    references: { model: 'users', key: 'id' }
   },
   approvedAt: {
     type: DataTypes.DATE
@@ -45,6 +45,28 @@ const Reimbursement = sequelize.define('Reimbursement', {
   isTaxable: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  categoryId: {
+    type: DataTypes.UUID,
+    references: { model: 'reimbursement_categories', key: 'id' }
+  },
+  currentLevel: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1
+  },
+  totalLevels: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1
+  },
+  rejectedBy: {
+    type: DataTypes.UUID,
+    references: { model: 'users', key: 'id' }
+  },
+  rejectedAt: {
+    type: DataTypes.DATE
+  },
+  rejectionReason: {
+    type: DataTypes.TEXT
   },
   paidAt: {
     type: DataTypes.DATE

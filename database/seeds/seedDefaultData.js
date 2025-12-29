@@ -41,6 +41,7 @@ const seedDefaultData = async () => {
     // Create default roles
     const roles = [
       { name: 'Super Admin', description: 'All modules + Global Setup', isSystemRole: true },
+      { name: 'Company Admin', description: 'Company management and user creation', isSystemRole: true },
       { name: 'HR/Admin', description: 'Employee + Payroll + Attendance', isSystemRole: true },
       { name: 'Finance', description: 'Salary Processing + Statutory Reports', isSystemRole: true },
       { name: 'Employee', description: 'Self-service portal', isSystemRole: true },

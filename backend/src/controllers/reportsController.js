@@ -1,8 +1,17 @@
 const logger = require('../utils/logger');
 const reportService = require('../services/reportService');
-const { AuditLog, Employee, Payslip, Payroll } = require('../models');
+const {
+  AuditLog,
+  Employee,
+  Payslip,
+  Payroll,
+  EmployeeHistory,
+  CustomReport,
+  SalaryStructure
+} = require('../models');
 const { Op } = require('sequelize');
 const path = require('path');
+const XLSX = require('xlsx');
 
 /**
  * Get PF Report
@@ -10,32 +19,20 @@ const path = require('path');
 exports.getPFReport = async (req, res) => {
   try {
     const { month, year, format = 'json' } = req.query;
-
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const report = await reportService.generatePFReport(
-      req.user.companyId,
-      parseInt(month),
-      parseInt(year)
-    );
-
-    if (format === 'excel') {
-      const filename = `PF_Report_${month}_${year}_${Date.now()}.xlsx`;
-      const filepath = reportService.exportReportToExcel(report.data, filename);
+    const report = await reportService.generatePFReport(req.user.companyId, parseInt(month), parseInt(year));
+    if (format === 'excel' || format === 'csv') {
+      const filename = `PF_Report_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(report.data, filename, format);
       const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
       return res.json({
         success: true,
         message: 'PF report generated successfully',
-        data: {
-          ...report,
-          excelPath: relativePath,
-          downloadUrl: `/api/reports/download/${relativePath}`
-        }
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
       });
     }
-
     res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get PF report error:', error);
@@ -49,32 +46,20 @@ exports.getPFReport = async (req, res) => {
 exports.getESIReport = async (req, res) => {
   try {
     const { month, year, format = 'json' } = req.query;
-
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const report = await reportService.generateESIReport(
-      req.user.companyId,
-      parseInt(month),
-      parseInt(year)
-    );
-
-    if (format === 'excel') {
-      const filename = `ESI_Report_${month}_${year}_${Date.now()}.xlsx`;
-      const filepath = reportService.exportReportToExcel(report.data, filename);
+    const report = await reportService.generateESIReport(req.user.companyId, parseInt(month), parseInt(year));
+    if (format === 'excel' || format === 'csv') {
+      const filename = `ESI_Report_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(report.data, filename, format);
       const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
       return res.json({
         success: true,
         message: 'ESI report generated successfully',
-        data: {
-          ...report,
-          excelPath: relativePath,
-          downloadUrl: `/api/reports/download/${relativePath}`
-        }
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
       });
     }
-
     res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get ESI report error:', error);
@@ -88,32 +73,20 @@ exports.getESIReport = async (req, res) => {
 exports.getTDSReport = async (req, res) => {
   try {
     const { month, year, format = 'json' } = req.query;
-
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const report = await reportService.generateTDSReport(
-      req.user.companyId,
-      parseInt(month),
-      parseInt(year)
-    );
-
-    if (format === 'excel') {
-      const filename = `TDS_Report_${month}_${year}_${Date.now()}.xlsx`;
-      const filepath = reportService.exportReportToExcel(report.data, filename);
+    const report = await reportService.generateTDSReport(req.user.companyId, parseInt(month), parseInt(year));
+    if (format === 'excel' || format === 'csv') {
+      const filename = `TDS_Report_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(report.data, filename, format);
       const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
       return res.json({
         success: true,
         message: 'TDS report generated successfully',
-        data: {
-          ...report,
-          excelPath: relativePath,
-          downloadUrl: `/api/reports/download/${relativePath}`
-        }
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
       });
     }
-
     res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get TDS report error:', error);
@@ -127,32 +100,20 @@ exports.getTDSReport = async (req, res) => {
 exports.getPTReport = async (req, res) => {
   try {
     const { month, year, format = 'json' } = req.query;
-
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const report = await reportService.generatePTReport(
-      req.user.companyId,
-      parseInt(month),
-      parseInt(year)
-    );
-
-    if (format === 'excel') {
-      const filename = `PT_Report_${month}_${year}_${Date.now()}.xlsx`;
-      const filepath = reportService.exportReportToExcel(report.data, filename);
+    const report = await reportService.generatePTReport(req.user.companyId, parseInt(month), parseInt(year));
+    if (format === 'excel' || format === 'csv') {
+      const filename = `PT_Report_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(report.data, filename, format);
       const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
       return res.json({
         success: true,
         message: 'PT report generated successfully',
-        data: {
-          ...report,
-          excelPath: relativePath,
-          downloadUrl: `/api/reports/download/${relativePath}`
-        }
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
       });
     }
-
     res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get PT report error:', error);
@@ -166,32 +127,20 @@ exports.getPTReport = async (req, res) => {
 exports.getSalaryRegister = async (req, res) => {
   try {
     const { month, year, format = 'json' } = req.query;
-
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const report = await reportService.generateSalaryRegister(
-      req.user.companyId,
-      parseInt(month),
-      parseInt(year)
-    );
-
-    if (format === 'excel') {
-      const filename = `Salary_Register_${month}_${year}_${Date.now()}.xlsx`;
-      const filepath = reportService.exportReportToExcel(report.data, filename);
+    const report = await reportService.generateSalaryRegister(req.user.companyId, parseInt(month), parseInt(year));
+    if (format === 'excel' || format === 'csv') {
+      const filename = `Salary_Register_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(report.data, filename, format);
       const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
       return res.json({
         success: true,
         message: 'Salary register generated successfully',
-        data: {
-          ...report,
-          excelPath: relativePath,
-          downloadUrl: `/api/reports/download/${relativePath}`
-        }
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
       });
     }
-
     res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get salary register error:', error);
@@ -200,71 +149,26 @@ exports.getSalaryRegister = async (req, res) => {
 };
 
 /**
- * Get Payroll Summary
+ * Get Payroll Summary (Head-wise)
  */
 exports.getPayrollSummary = async (req, res) => {
   try {
-    const { month, year } = req.query;
-
+    const { month, year, format = 'json' } = req.query;
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const payroll = await Payroll.findOne({
-      where: {
-        companyId: req.user.companyId,
-        month: parseInt(month),
-        year: parseInt(year)
-      },
-      include: [{
-        model: Payslip,
-        as: 'payslips',
-        include: [{
-          model: Employee,
-          as: 'employee',
-          attributes: ['id', 'employeeCode', 'firstName', 'lastName', 'department', 'designation']
-        }]
-      }]
-    });
-
-    if (!payroll) {
-      return res.status(404).json({ success: false, message: 'Payroll not found' });
+    const report = await reportService.generatePayrollSummary(req.user.companyId, parseInt(month), parseInt(year));
+    if (format === 'excel' || format === 'csv') {
+      const filename = `Payroll_Summary_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(report.data, filename, format);
+      const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
+      return res.json({
+        success: true,
+        message: 'Payroll summary generated successfully',
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
+      });
     }
-
-    // Calculate department-wise summary
-    const departmentSummary = {};
-    payroll.payslips.forEach(payslip => {
-      const dept = payslip.employee.department || 'Unassigned';
-      if (!departmentSummary[dept]) {
-        departmentSummary[dept] = {
-          employees: 0,
-          totalGross: 0,
-          totalDeductions: 0,
-          totalNet: 0
-        };
-      }
-      departmentSummary[dept].employees++;
-      departmentSummary[dept].totalGross += parseFloat(payslip.grossSalary) || 0;
-      departmentSummary[dept].totalDeductions += parseFloat(payslip.totalDeductions) || 0;
-      departmentSummary[dept].totalNet += parseFloat(payslip.netSalary) || 0;
-    });
-
-    res.json({
-      success: true,
-      data: {
-        payroll: {
-          id: payroll.id,
-          month: payroll.month,
-          year: payroll.year,
-          status: payroll.status,
-          totalEmployees: payroll.totalEmployees,
-          totalGrossSalary: parseFloat(payroll.totalGrossSalary) || 0,
-          totalDeductions: parseFloat(payroll.totalDeductions) || 0,
-          totalNetSalary: parseFloat(payroll.totalNetSalary) || 0
-        },
-        departmentSummary
-      }
-    });
+    res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get payroll summary error:', error);
     res.status(500).json({ success: false, message: 'Failed to generate payroll summary', error: error.message });
@@ -272,7 +176,7 @@ exports.getPayrollSummary = async (req, res) => {
 };
 
 /**
- * Get Payslip (redirect to payroll controller)
+ * Get Payslip (PDF with branding)
  */
 exports.getPayslip = async (req, res) => {
   try {
@@ -280,83 +184,38 @@ exports.getPayslip = async (req, res) => {
     const payslip = await Payslip.findByPk(id, {
       include: [{ model: Employee, as: 'employee' }]
     });
-
     if (!payslip) {
       return res.status(404).json({ success: false, message: 'Payslip not found' });
     }
-
-    res.json({ success: true, data: payslip });
+    const pdfService = require('../services/pdfService');
+    const pdfPath = await pdfService.generatePayslipPDF(payslip);
+    res.sendFile(pdfPath);
   } catch (error) {
     logger.error('Get payslip error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch payslip', error: error.message });
+    res.status(500).json({ success: false, message: 'Failed to generate payslip', error: error.message });
   }
 };
 
 /**
- * Get Reconciliation Report
+ * Get Reconciliation Report (with salary variation tracker)
  */
 exports.getReconciliationReport = async (req, res) => {
   try {
     const { month, year, format = 'json' } = req.query;
-
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const report = await reportService.generateReconciliationReport(
-      req.user.companyId,
-      parseInt(month),
-      parseInt(year)
-    );
-
-    if (format === 'excel') {
-      // Create comparison data for Excel
-      const excelData = [];
-      if (report.comparison.current) {
-        excelData.push({
-          'Period': `${report.comparison.current.month}/${report.comparison.current.year}`,
-          'Type': 'Current',
-          'Employees': report.comparison.current.totalEmployees,
-          'Gross Salary': report.comparison.current.totalGross,
-          'Deductions': report.comparison.current.totalDeductions,
-          'Net Salary': report.comparison.current.totalNet
-        });
-      }
-      if (report.comparison.previous1) {
-        excelData.push({
-          'Period': `${report.comparison.previous1.month}/${report.comparison.previous1.year}`,
-          'Type': 'Previous Month 1',
-          'Employees': report.comparison.previous1.totalEmployees,
-          'Gross Salary': report.comparison.previous1.totalGross,
-          'Deductions': report.comparison.previous1.totalDeductions,
-          'Net Salary': report.comparison.previous1.totalNet
-        });
-      }
-      if (report.comparison.previous2) {
-        excelData.push({
-          'Period': `${report.comparison.previous2.month}/${report.comparison.previous2.year}`,
-          'Type': 'Previous Month 2',
-          'Employees': report.comparison.previous2.totalEmployees,
-          'Gross Salary': report.comparison.previous2.totalGross,
-          'Deductions': report.comparison.previous2.totalDeductions,
-          'Net Salary': report.comparison.previous2.totalNet
-        });
-      }
-
-      const filename = `Reconciliation_Report_${month}_${year}_${Date.now()}.xlsx`;
-      const filepath = reportService.exportReportToExcel(excelData, filename);
+    const report = await reportService.generateReconciliationReport(req.user.companyId, parseInt(month), parseInt(year));
+    if (format === 'excel' || format === 'csv') {
+      const filename = `Reconciliation_Report_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(report.data, filename, format);
       const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
       return res.json({
         success: true,
         message: 'Reconciliation report generated successfully',
-        data: {
-          ...report,
-          excelPath: relativePath,
-          downloadUrl: `/api/reports/download/${relativePath}`
-        }
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
       });
     }
-
     res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get reconciliation report error:', error);
@@ -369,33 +228,21 @@ exports.getReconciliationReport = async (req, res) => {
  */
 exports.getBankTransferReport = async (req, res) => {
   try {
-    const { month, year, format = 'json' } = req.query;
-
+    const { month, year, format = 'json', bankName } = req.query;
     if (!month || !year) {
       return res.status(400).json({ success: false, message: 'Month and year are required' });
     }
-
-    const report = await reportService.generateBankTransferReport(
-      req.user.companyId,
-      parseInt(month),
-      parseInt(year)
-    );
-
-    if (format === 'excel' || format === 'csv') {
-      const filename = `Bank_Transfer_${month}_${year}_${Date.now()}.xlsx`;
-      const filepath = reportService.exportReportToExcel(report.data, filename);
+    const report = await reportService.generateBankTransferReport(req.user.companyId, parseInt(month), parseInt(year), bankName);
+    if (format === 'excel' || format === 'csv' || format === 'neft') {
+      const filename = `Bank_Transfer_${month}_${year}_${Date.now()}.${format === 'csv' ? 'csv' : format === 'neft' ? 'txt' : 'xlsx'}`;
+      const filepath = reportService.exportBankTransferReport(report.data, filename, format);
       const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
       return res.json({
         success: true,
         message: 'Bank transfer report generated successfully',
-        data: {
-          ...report,
-          excelPath: relativePath,
-          downloadUrl: `/api/reports/download/${relativePath}`
-        }
+        data: { ...report, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
       });
     }
-
     res.json({ success: true, data: report });
   } catch (error) {
     logger.error('Get bank transfer report error:', error);
@@ -409,46 +256,36 @@ exports.getBankTransferReport = async (req, res) => {
 exports.getEmployeeHistory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { type } = req.query; // 'all', 'designation', 'department', 'salary'
-
-    const employee = await Employee.findByPk(id);
-    if (!employee) {
-      return res.status(404).json({ success: false, message: 'Employee not found' });
+    const { changeType, fromDate, toDate, page = 1, limit = 50 } = req.query;
+    const offset = (page - 1) * limit;
+    
+    const whereClause = { employeeId: id };
+    if (changeType) whereClause.changeType = changeType;
+    if (fromDate || toDate) {
+      whereClause.createdAt = {};
+      if (fromDate) whereClause.createdAt[Op.gte] = new Date(fromDate);
+      if (toDate) whereClause.createdAt[Op.lte] = new Date(toDate);
     }
-
-    // Get audit logs for this employee
-    const whereClause = {
-      entityType: 'Employee',
-      entityId: id
-    };
-
-    if (type && type !== 'all') {
-      whereClause.module = type;
-    }
-
-    const auditLogs = await AuditLog.findAll({
+    
+    const { count, rows } = await EmployeeHistory.findAndCountAll({
       where: whereClause,
-      order: [['createdAt', 'DESC']],
-      limit: 100
+      include: [
+        { model: Employee, as: 'employee', attributes: ['id', 'employeeCode', 'firstName', 'lastName'] },
+        { model: require('../models').User, as: 'changer', attributes: ['id', 'email', 'firstName', 'lastName'] }
+      ],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']]
     });
-
-    // Get salary structure changes
-    const { SalaryStructure } = require('../models');
-    const salaryStructures = await SalaryStructure.findAll({
-      where: { employeeId: id },
-      order: [['effectiveDate', 'DESC']]
-    });
-
+    
     res.json({
       success: true,
-      data: {
-        employee: {
-          id: employee.id,
-          employeeCode: employee.employeeCode,
-          name: `${employee.firstName} ${employee.lastName}`
-        },
-        auditLogs: auditLogs,
-        salaryHistory: salaryStructures
+      data: rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(count / limit)
       }
     });
   } catch (error) {
@@ -457,14 +294,211 @@ exports.getEmployeeHistory = async (req, res) => {
   }
 };
 
+/**
+ * Get Audit Logs
+ */
 exports.getAuditLogs = async (req, res) => {
   try {
-    const { AuditLog } = require('../models');
-    const logs = await AuditLog.findAll({ limit: 100, order: [['createdAt', 'DESC']] });
-    res.json({ success: true, data: logs });
+    const { module, action, entityType, fromDate, toDate, userId, page = 1, limit = 50 } = req.query;
+    const offset = (page - 1) * limit;
+    
+    const whereClause = { companyId: req.user.companyId };
+    if (module) whereClause.module = module;
+    if (action) whereClause.action = action;
+    if (entityType) whereClause.entityType = entityType;
+    if (userId) whereClause.userId = userId;
+    if (fromDate || toDate) {
+      whereClause.createdAt = {};
+      if (fromDate) whereClause.createdAt[Op.gte] = new Date(fromDate);
+      if (toDate) whereClause.createdAt[Op.lte] = new Date(toDate);
+    }
+    
+    const { count, rows } = await AuditLog.findAndCountAll({
+      where: whereClause,
+      include: [
+        { model: require('../models').User, as: 'user', attributes: ['id', 'email', 'firstName', 'lastName'] }
+      ],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['createdAt', 'DESC']]
+    });
+    
+    res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        total: count,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(count / limit)
+      }
+    });
   } catch (error) {
     logger.error('Get audit logs error:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch audit logs' });
+    res.status(500).json({ success: false, message: 'Failed to fetch audit logs', error: error.message });
   }
 };
 
+/**
+ * Export Audit Logs
+ */
+exports.exportAuditLogs = async (req, res) => {
+  try {
+    const { module, action, entityType, fromDate, toDate, userId, format = 'excel' } = req.query;
+    
+    const whereClause = { companyId: req.user.companyId };
+    if (module) whereClause.module = module;
+    if (action) whereClause.action = action;
+    if (entityType) whereClause.entityType = entityType;
+    if (userId) whereClause.userId = userId;
+    if (fromDate || toDate) {
+      whereClause.createdAt = {};
+      if (fromDate) whereClause.createdAt[Op.gte] = new Date(fromDate);
+      if (toDate) whereClause.createdAt[Op.lte] = new Date(toDate);
+    }
+    
+    const logs = await AuditLog.findAll({
+      where: whereClause,
+      include: [
+        { model: require('../models').User, as: 'user', attributes: ['id', 'email', 'firstName', 'lastName'] }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    
+    const excelData = logs.map(log => ({
+      'Timestamp': log.createdAt,
+      'User': `${log.user?.firstName || ''} ${log.user?.lastName || ''} (${log.user?.email || ''})`,
+      'Module': log.module,
+      'Action': log.action,
+      'Entity Type': log.entityType,
+      'Entity ID': log.entityId,
+      'IP Address': log.ipAddress,
+      'Description': log.description || ''
+    }));
+    
+    const filename = `Audit_Logs_${Date.now()}.${format === 'csv' ? 'csv' : 'xlsx'}`;
+    const filepath = reportService.exportReportToExcel(excelData, filename, format);
+    const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
+    
+    res.json({
+      success: true,
+      message: 'Audit logs exported successfully',
+      data: { excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
+    });
+  } catch (error) {
+    logger.error('Export audit logs error:', error);
+    res.status(500).json({ success: false, message: 'Failed to export audit logs', error: error.message });
+  }
+};
+
+/**
+ * Get all custom reports
+ */
+exports.getCustomReports = async (req, res) => {
+  try {
+    const reports = await CustomReport.findAll({
+      where: { companyId: req.user.companyId, isActive: true },
+      include: [
+        { model: require('../models').User, as: 'creator', attributes: ['id', 'email', 'firstName', 'lastName'] }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json({ success: true, data: reports });
+  } catch (error) {
+    logger.error('Get custom reports error:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch custom reports', error: error.message });
+  }
+};
+
+/**
+ * Create custom report
+ */
+exports.createCustomReport = async (req, res) => {
+  try {
+    const report = await CustomReport.create({
+      ...req.body,
+      companyId: req.user.companyId,
+      createdBy: req.user.id
+    });
+    res.status(201).json({ success: true, data: report });
+  } catch (error) {
+    logger.error('Create custom report error:', error);
+    res.status(500).json({ success: false, message: 'Failed to create custom report', error: error.message });
+  }
+};
+
+/**
+ * Update custom report
+ */
+exports.updateCustomReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = await CustomReport.findOne({
+      where: { id, companyId: req.user.companyId }
+    });
+    if (!report) {
+      return res.status(404).json({ success: false, message: 'Custom report not found' });
+    }
+    await report.update(req.body);
+    res.json({ success: true, data: report });
+  } catch (error) {
+    logger.error('Update custom report error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update custom report', error: error.message });
+  }
+};
+
+/**
+ * Delete custom report
+ */
+exports.deleteCustomReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = await CustomReport.findOne({
+      where: { id, companyId: req.user.companyId }
+    });
+    if (!report) {
+      return res.status(404).json({ success: false, message: 'Custom report not found' });
+    }
+    await report.destroy();
+    res.json({ success: true, message: 'Custom report deleted successfully' });
+  } catch (error) {
+    logger.error('Delete custom report error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete custom report', error: error.message });
+  }
+};
+
+/**
+ * Execute custom report
+ */
+exports.executeCustomReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { params } = req.body; // Additional parameters for report execution
+    
+    const report = await CustomReport.findOne({
+      where: { id, companyId: req.user.companyId, isActive: true }
+    });
+    
+    if (!report) {
+      return res.status(404).json({ success: false, message: 'Custom report not found' });
+    }
+    
+    const result = await reportService.executeCustomReport(report, params || {});
+    
+    if (report.format === 'excel' || report.format === 'csv') {
+      const filename = `${report.reportName}_${Date.now()}.${report.format === 'csv' ? 'csv' : 'xlsx'}`;
+      const filepath = reportService.exportReportToExcel(result.data, filename, report.format);
+      const relativePath = filepath.replace(path.join(__dirname, '../../uploads/'), '');
+      return res.json({
+        success: true,
+        message: 'Custom report executed successfully',
+        data: { ...result, excelPath: relativePath, downloadUrl: `/api/reports/download/${relativePath}` }
+      });
+    }
+    
+    res.json({ success: true, data: result });
+  } catch (error) {
+    logger.error('Execute custom report error:', error);
+    res.status(500).json({ success: false, message: 'Failed to execute custom report', error: error.message });
+  }
+};

@@ -14,8 +14,10 @@ router.post('/leave', portalValidation.applyLeave, authenticate, portalControlle
 router.get('/leave-history', authenticate, portalController.getLeaveHistory);
 router.post('/it-declaration', authenticate, portalController.submitITDeclaration);
 router.get('/it-declaration', authenticate, portalController.getITDeclaration);
+router.get('/profile', authenticate, portalController.getProfile);
 router.put('/profile', portalValidation.updateProfile, authenticate, portalController.updateProfile);
-router.post('/helpdesk', authenticate, portalController.raiseQuery);
+router.get('/helpdesk', authenticate, portalController.getQueries);
+router.post('/helpdesk', portalValidation.raiseQuery, authenticate, portalController.raiseQuery);
 
 module.exports = router;
 

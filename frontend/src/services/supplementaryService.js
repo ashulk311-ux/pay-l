@@ -21,6 +21,15 @@ export const supplementaryService = {
     return response.data;
   },
 
+  bulkImport: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post('/supplementary/bulk-import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
   update: async (id, data) => {
     const response = await api.put(`/supplementary/${id}`, data);
     return response.data;
@@ -31,4 +40,3 @@ export const supplementaryService = {
     return response.data;
   }
 };
-

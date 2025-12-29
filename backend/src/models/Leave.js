@@ -10,7 +10,7 @@ const Leave = sequelize.define('Leave', {
   employeeId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Employees', key: 'id' }
+    references: { model: 'employees', key: 'id' }
   },
   leaveType: {
     type: DataTypes.ENUM('CL', 'SL', 'PL', 'EL', 'ML', 'LWP'),
@@ -37,7 +37,7 @@ const Leave = sequelize.define('Leave', {
   },
   approvedBy: {
     type: DataTypes.UUID,
-    references: { model: 'Users', key: 'id' }
+    references: { model: 'users', key: 'id' }
   },
   approvedAt: {
     type: DataTypes.DATE

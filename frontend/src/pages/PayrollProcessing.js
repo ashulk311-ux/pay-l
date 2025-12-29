@@ -39,7 +39,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { payrollService } from '../services/payrollService';
 import DataTable from '../components/DataTable';
 
-const steps = ['Select Period', 'Lock Attendance', 'Process Payroll', 'Finalize', 'Generate Payslips'];
+const steps = ['Select Period', 'Pre-Checks', 'Lock Attendance', 'Apply Earnings/Deductions', 'Process Payroll', 'Finalize', 'Generate Payslips'];
 
 export default function PayrollProcessing() {
   const queryClient = useQueryClient();
@@ -58,6 +58,12 @@ export default function PayrollProcessing() {
     ['payslips', selectedPayroll?.id],
     () => payrollService.getPayslips(selectedPayroll?.id),
     { enabled: !!selectedPayroll?.id, refetchOnWindowFocus: false }
+  );
+
+  const { data: payrollData } = useQuery(
+    ['payroll', selectedPayroll?.id],
+    () => payrollService.getById(selectedPayroll.id),
+    { enabled: !!selectedPayroll?.id && selectedPayroll?.preCheckCompleted, refetchOnWindowFocus: false }
   );
 
   const createMutation = useMutation(
@@ -127,6 +133,33 @@ export default function PayrollProcessing() {
     }
   );
 
+  const runPreChecksMutation = useMutation(
+    (id) => payrollService.runPreChecks(id),
+    {
+      onSuccess: (data) => {
+        toast.success(data.message || 'Pre-checks completed successfully');
+        queryClient.invalidateQueries('payrolls');
+        queryClient.invalidateQueries(['payroll', selectedPayroll?.id]);
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || 'Failed to run pre-checks');
+      }
+    }
+  );
+
+  const applyEarningsDeductionsMutation = useMutation(
+    (id) => payrollService.applyEarningsDeductions(id),
+    {
+      onSuccess: (data) => {
+        toast.success(data.message || 'Earnings/deductions applied successfully');
+        queryClient.invalidateQueries('payrolls');
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || 'Failed to apply earnings/deductions');
+      }
+    }
+  );
+
   const handleCreatePayroll = () => {
     createMutation.mutate({
       month: selectedMonth,
@@ -178,10 +211,12 @@ export default function PayrollProcessing() {
   };
 
   const getActiveStep = (payroll) => {
-    if (payroll.status === 'paid') return 4;
-    if (payroll.status === 'finalized') return 3;
-    if (payroll.status === 'locked') return 2;
-    if (payroll.attendanceLocked) return 1;
+    if (payroll.status === 'paid') return 6;
+    if (payroll.status === 'finalized') return 5;
+    if (payroll.status === 'locked') return 4;
+    if (payroll.earningsApplied && payroll.deductionsApplied) return 3;
+    if (payroll.attendanceLocked) return 2;
+    if (payroll.preCheckCompleted) return 1;
     return 0;
   };
 
@@ -266,6 +301,8 @@ export default function PayrollProcessing() {
 
       {payrolls.map((payroll) => {
         const activeStep = getActiveStep(payroll);
+        const isSelected = selectedPayroll?.id === payroll.id;
+        const currentPayrollData = isSelected ? payrollData : null;
         return (
           <Paper key={payroll.id} sx={{ p: 3, mb: 3 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -285,7 +322,17 @@ export default function PayrollProcessing() {
                 />
               </Box>
               <Box>
-                {!payroll.attendanceLocked && (
+                {!payroll.preCheckCompleted && (
+                  <Button
+                    startIcon={<PlayArrowIcon />}
+                    onClick={() => runPreChecksMutation.mutate(payroll.id)}
+                    disabled={runPreChecksMutation.isLoading}
+                    sx={{ mr: 1 }}
+                  >
+                    Run Pre-Checks
+                  </Button>
+                )}
+                {payroll.preCheckCompleted && !payroll.attendanceLocked && (
                   <Button
                     startIcon={<LockIcon />}
                     onClick={() => handleLockAttendance(payroll.id)}
@@ -295,7 +342,18 @@ export default function PayrollProcessing() {
                     Lock Attendance
                   </Button>
                 )}
-                {payroll.attendanceLocked && payroll.status === 'draft' && (
+                {payroll.attendanceLocked && !payroll.earningsApplied && (
+                  <Button
+                    startIcon={<PlayArrowIcon />}
+                    variant="outlined"
+                    onClick={() => applyEarningsDeductionsMutation.mutate(payroll.id)}
+                    disabled={applyEarningsDeductionsMutation.isLoading}
+                    sx={{ mr: 1 }}
+                  >
+                    Apply Earnings/Deductions
+                  </Button>
+                )}
+                {payroll.earningsApplied && payroll.deductionsApplied && payroll.status === 'draft' && (
                   <Button
                     startIcon={<PlayArrowIcon />}
                     variant="contained"
@@ -338,6 +396,80 @@ export default function PayrollProcessing() {
                 </Step>
               ))}
             </Stepper>
+
+            {isSelected && payroll.preCheckCompleted && currentPayrollData?.data?.preChecks && currentPayrollData.data.preChecks.length > 0 && (
+              <Box sx={{ mt: 3, mb: 2 }}>
+                <Typography variant="h6" gutterBottom>Pre-Check Results</Typography>
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  <Grid item xs={12} sm={3}>
+                    <Chip label={`Total: ${currentPayrollData.data.preChecks.length}`} color="default" />
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <Chip 
+                      label={`Warnings: ${currentPayrollData.data.preChecks.filter(c => c.checkStatus === 'warning').length}`} 
+                      color="warning" 
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <Chip 
+                      label={`Pending: ${currentPayrollData.data.preChecks.filter(c => c.checkStatus === 'pending').length}`} 
+                      color="info" 
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={3}>
+                    <Chip 
+                      label={`Errors: ${currentPayrollData.data.preChecks.filter(c => c.checkStatus === 'error').length}`} 
+                      color="error" 
+                    />
+                  </Grid>
+                </Grid>
+                <TableContainer component={Paper} variant="outlined">
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Employee</TableCell>
+                        <TableCell>Check Type</TableCell>
+                        <TableCell>Status</TableCell>
+                        <TableCell>Description</TableCell>
+                        <TableCell>Amount</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {currentPayrollData.data.preChecks.slice(0, 5).map((check) => (
+                        <TableRow key={check.id}>
+                          <TableCell>
+                            {check.employee?.employeeCode || 'N/A'}
+                          </TableCell>
+                          <TableCell>
+                            <Chip label={check.checkType} size="small" />
+                          </TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={check.checkStatus} 
+                              size="small"
+                              color={
+                                check.checkStatus === 'error' ? 'error' :
+                                check.checkStatus === 'warning' ? 'warning' :
+                                check.checkStatus === 'pending' ? 'info' : 'default'
+                              }
+                            />
+                          </TableCell>
+                          <TableCell>{check.description}</TableCell>
+                          <TableCell>
+                            {check.amount > 0 ? `₹${parseFloat(check.amount).toLocaleString('en-IN')}` : '-'}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                {currentPayrollData.data.preChecks.length > 5 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Showing 5 of {currentPayrollData.data.preChecks.length} checks. View all in payroll details.
+                  </Typography>
+                )}
+              </Box>
+            )}
 
             <Grid container spacing={2} sx={{ mt: 2 }}>
               <Grid item xs={12} sm={3}>

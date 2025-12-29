@@ -10,7 +10,7 @@ const SalaryIncrement = sequelize.define('SalaryIncrement', {
   employeeId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Employees', key: 'id' }
+    references: { model: 'employees', key: 'id' }
   },
   effectiveDate: {
     type: DataTypes.DATEONLY,
@@ -40,7 +40,7 @@ const SalaryIncrement = sequelize.define('SalaryIncrement', {
   },
   approvedBy: {
     type: DataTypes.UUID,
-    references: { model: 'Users', key: 'id' }
+    references: { model: 'users', key: 'id' }
   },
   approvedAt: {
     type: DataTypes.DATE
@@ -48,6 +48,49 @@ const SalaryIncrement = sequelize.define('SalaryIncrement', {
   isApplied: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  appliedAt: {
+    type: DataTypes.DATE
+  },
+  previousDesignationId: {
+    type: DataTypes.UUID,
+    references: { model: 'designations', key: 'id' }
+  },
+  newDesignationId: {
+    type: DataTypes.UUID,
+    references: { model: 'designations', key: 'id' }
+  },
+  previousGrade: {
+    type: DataTypes.STRING
+  },
+  newGrade: {
+    type: DataTypes.STRING
+  },
+  incrementType: {
+    type: DataTypes.ENUM('individual', 'grade_based', 'designation_based', 'policy_based'),
+    defaultValue: 'individual'
+  },
+  policyId: {
+    type: DataTypes.UUID,
+    references: { model: 'increment_policies', key: 'id' }
+  },
+  currentLevel: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1
+  },
+  totalLevels: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1
+  },
+  rejectedBy: {
+    type: DataTypes.UUID,
+    references: { model: 'users', key: 'id' }
+  },
+  rejectedAt: {
+    type: DataTypes.DATE
+  },
+  rejectionReason: {
+    type: DataTypes.TEXT
   }
 }, {
   tableName: 'salary_increments'

@@ -10,7 +10,7 @@ const SupplementarySalary = sequelize.define('SupplementarySalary', {
   employeeId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Employees', key: 'id' }
+    references: { model: 'employees', key: 'id' }
   },
   type: {
     type: DataTypes.ENUM('arrears', 'incentive', 'bonus', 'full-final', 'other'),
@@ -35,7 +35,27 @@ const SupplementarySalary = sequelize.define('SupplementarySalary', {
   },
   processedInPayrollId: {
     type: DataTypes.UUID,
-    references: { model: 'Payrolls', key: 'id' }
+    references: { model: 'payrolls', key: 'id' }
+  },
+  effectiveDate: {
+    type: DataTypes.DATEONLY
+  },
+  arrearsFromDate: {
+    type: DataTypes.DATEONLY
+  },
+  arrearsToDate: {
+    type: DataTypes.DATEONLY
+  },
+  incentivePeriod: {
+    type: DataTypes.STRING
+  },
+  isTaxable: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  taxDeducted: {
+    type: DataTypes.DECIMAL(12, 2),
+    defaultValue: 0
   }
 }, {
   tableName: 'supplementary_salaries'

@@ -10,6 +10,7 @@ router.get('/:id', authenticate, authorize('view_reimbursement'), reimbursementC
 router.post('/', reimbursementValidation.create, authenticate, authorize('manage_reimbursement'), upload.array('documents'), reimbursementController.createReimbursement);
 router.put('/:id', authenticate, authorize('manage_reimbursement'), reimbursementController.updateReimbursement);
 router.put('/:id/approve', authenticate, authorize('manage_reimbursement'), reimbursementController.approveReimbursement);
+router.put('/:id/reject', authenticate, authorize('manage_reimbursement'), reimbursementController.rejectReimbursement);
 router.get('/employee/:employeeId', authenticate, authorize('view_reimbursement'), reimbursementController.getEmployeeReimbursements);
 
 module.exports = router;

@@ -329,6 +329,23 @@ const reportValidation = {
 };
 
 /**
+ * Validation rules for pagination
+ */
+const paginationValidation = {
+  validate: [
+    query('page')
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage('Page must be a positive integer'),
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 200 })
+      .withMessage('Limit must be between 1 and 200'),
+    handleValidationErrors
+  ]
+};
+
+/**
  * Validation rules for portal (employee self-service)
  */
 const portalValidation = {
@@ -350,6 +367,25 @@ const portalValidation = {
       .matches(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/)
       .withMessage('Valid phone number is required'),
     handleValidationErrors
+  ],
+  raiseQuery: [
+    body('subject')
+      .trim()
+      .notEmpty()
+      .withMessage('Subject is required')
+      .isLength({ max: 200 })
+      .withMessage('Subject must be less than 200 characters'),
+    body('description')
+      .trim()
+      .notEmpty()
+      .withMessage('Description is required')
+      .isLength({ max: 2000 })
+      .withMessage('Description must be less than 2000 characters'),
+    body('category')
+      .optional()
+      .isIn(['Payroll', 'Attendance', 'Leave', 'Salary', 'Profile Update', 'Technical Issue', 'Other'])
+      .withMessage('Valid category is required'),
+    handleValidationErrors
   ]
 };
 
@@ -357,6 +393,7 @@ module.exports = {
   handleValidationErrors,
   authValidation,
   employeeValidation,
+  paginationValidation,
   payrollValidation,
   loanValidation,
   reimbursementValidation,

@@ -8,6 +8,7 @@ router.get('/', authenticate, authorize('view_supplementary'), supplementaryCont
 router.get('/:id', authenticate, authorize('view_supplementary'), supplementaryController.getSupplementary);
 router.post('/', supplementaryValidation.create, authenticate, authorize('manage_supplementary'), supplementaryController.createSupplementary);
 router.post('/bulk', authenticate, authorize('manage_supplementary'), supplementaryController.bulkCreate);
+router.post('/bulk-import', authenticate, authorize('manage_supplementary'), require('../middleware/upload').single('file'), supplementaryController.bulkImport);
 router.put('/:id', authenticate, authorize('manage_supplementary'), supplementaryController.updateSupplementary);
 router.delete('/:id', authenticate, authorize('manage_supplementary'), supplementaryController.deleteSupplementary);
 

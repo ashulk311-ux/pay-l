@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -6,7 +7,8 @@ import {
   Paper,
   Box,
   Card,
-  CardContent
+  CardContent,
+  Button
 } from '@mui/material';
 import { useQuery } from 'react-query';
 import {
@@ -31,19 +33,91 @@ import EventIcon from '@mui/icons-material/Event';
 import { employeeService } from '../services/employeeService';
 import { payrollService } from '../services/payrollService';
 import { reportService } from '../services/reportService';
+import { companyService } from '../services/companyService';
+import { useAuth } from '../context/AuthContext';
+import BusinessIcon from '@mui/icons-material/Business';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export default function Dashboard() {
-  const { data: employeesData } = useQuery('employees', () => employeeService.getAll(), { refetchOnWindowFocus: false });
-  const { data: payrollsData } = useQuery('payrolls', () => payrollService.getAll(), { refetchOnWindowFocus: false });
-  const { data: analyticsData } = useQuery('dashboardAnalytics', () => reportService.getDashboardAnalytics(), { refetchOnWindowFocus: false });
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const totalEmployees = employeesData?.data?.length || 0;
-  const activePayrolls = payrollsData?.data?.filter(p => p.status === 'finalized' || p.status === 'locked').length || 0;
-  const pendingPayrolls = payrollsData?.data?.filter(p => p.status === 'draft').length || 0;
+  // Redirect employees to portal dashboard
+  useEffect(() => {
+    if (user && user.role?.name === 'Employee') {
+      navigate('/portal', { replace: true });
+    }
+  }, [user, navigate]);
 
-  const stats = [
+  // Only fetch admin data if user is not an Employee or Super Admin
+  const isEmployee = user?.role?.name === 'Employee';
+  const isSuperAdmin = user?.role?.name?.toLowerCase() === 'super admin';
+  const isCompanyAdmin = user?.role?.name?.toLowerCase() === 'company admin';
+  const isHRAdmin = user?.role?.name?.toLowerCase() === 'hr/admin';
+  
+  // Fetch data for Company Admin and HR/Admin
+  const shouldFetchAdminData = !isEmployee && !isSuperAdmin && (isCompanyAdmin || isHRAdmin);
+  
+  const { data: employeesData, isLoading: employeesLoading, error: employeesError } = useQuery(
+    'employees', 
+    () => employeeService.getAll(), 
+    { 
+      refetchOnWindowFocus: false,
+      enabled: shouldFetchAdminData
+    }
+  );
+  
+  const { data: payrollsData, isLoading: payrollsLoading, error: payrollsError } = useQuery(
+    'payrolls', 
+    () => payrollService.getAll(), 
+    { 
+      refetchOnWindowFocus: false,
+      enabled: shouldFetchAdminData
+    }
+  );
+  
+  const { data: analyticsData, isLoading: analyticsLoading, error: analyticsError } = useQuery(
+    'dashboardAnalytics', 
+    () => reportService.getDashboardAnalytics(), 
+    { 
+      refetchOnWindowFocus: false,
+      enabled: shouldFetchAdminData
+    }
+  );
+
+  // Super Admin Dashboard - Simple view
+  const { data: companiesData, isLoading: companiesLoading, error: companiesError } = useQuery(
+    'companies',
+    () => companyService.getAll(),
+    {
+      refetchOnWindowFocus: false,
+      enabled: isSuperAdmin,
+      retry: 1
+    }
+  );
+
+  // Super Admin stats
+  const companies = companiesData?.data || [];
+  const totalCompanies = companies.length;
+  const activeCompanies = companies.filter(c => c.isActive).length;
+  const inactiveCompanies = companies.filter(c => !c.isActive).length;
+
+  // Regular Admin/HR/Company Admin stats
+  const employees = employeesData?.data || [];
+  const payrolls = payrollsData?.data || [];
+  const totalEmployees = Array.isArray(employees) ? employees.length : 0;
+  const activePayrolls = Array.isArray(payrolls) ? payrolls.filter(p => p.status === 'finalized' || p.status === 'locked').length : 0;
+  const pendingPayrolls = Array.isArray(payrolls) ? payrolls.filter(p => p.status === 'draft').length : 0;
+  const isLoadingData = employeesLoading || payrollsLoading || analyticsLoading;
+  const hasDataError = employeesError || payrollsError || analyticsError;
+
+  const stats = isSuperAdmin ? [
+    { title: 'Total Companies', value: totalCompanies.toString(), icon: <BusinessIcon />, color: '#1976d2' },
+    { title: 'Active Companies', value: activeCompanies.toString(), icon: <BusinessIcon />, color: '#2e7d32' },
+    { title: 'Inactive Companies', value: inactiveCompanies.toString(), icon: <BusinessIcon />, color: '#d32f2f' },
+    { title: 'System Status', value: 'Active', icon: <AssessmentIcon />, color: '#9c27b0' },
+  ] : [
     { title: 'Total Employees', value: totalEmployees.toString(), icon: <PeopleIcon />, color: '#1976d2' },
     { title: 'Active Payrolls', value: activePayrolls.toString(), icon: <AccountBalanceIcon />, color: '#2e7d32' },
     { title: 'Pending Payrolls', value: pendingPayrolls.toString(), icon: <EventIcon />, color: '#ed6c02' },
@@ -69,11 +143,185 @@ export default function Dashboard() {
     { name: 'Half Day', value: analytics.attendanceSummary.halfDay || 0 }
   ] : [];
 
+  // Super Admin - Simple dashboard
+  if (isSuperAdmin) {
+    return (
+      <Container maxWidth="xl">
+        <Typography variant="h4" gutterBottom>
+          Super Admin Dashboard
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Manage companies and users across the system
+        </Typography>
+
+        {/* Loading State */}
+        {companiesLoading && (
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Loading companies...
+          </Typography>
+        )}
+
+        {/* Error State */}
+        {companiesError && (
+          <Typography variant="body1" color="error" sx={{ mb: 2 }}>
+            Error loading companies: {companiesError.message}
+          </Typography>
+        )}
+
+        {/* Stats Cards */}
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          {stats.map((stat) => (
+            <Grid item xs={12} sm={6} md={3} key={stat.title}>
+              <Card>
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Box sx={{ color: stat.color, mr: 2 }}>
+                      {React.cloneElement(stat.icon, { sx: { fontSize: 40 } })}
+                    </Box>
+                    <Box>
+                      <Typography variant="h4" component="div">
+                        {stat.value}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {stat.title}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          {/* Companies List */}
+          <Grid item xs={12} md={8}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Companies
+              </Typography>
+              {companiesLoading ? (
+                <Typography variant="body2" color="text.secondary">
+                  Loading...
+                </Typography>
+              ) : companies.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">
+                  No companies found. Create your first company to get started.
+                </Typography>
+              ) : (
+                <Box sx={{ mt: 2 }}>
+                  {companies.map((company) => (
+                    <Card key={company.id} variant="outlined" sx={{ mb: 2 }}>
+                      <CardContent>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box>
+                            <Typography variant="h6">{company.name}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Code: {company.code} | Email: {company.email || 'N/A'}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Status: {company.isActive ? (
+                                <span style={{ color: '#2e7d32' }}>Active</span>
+                              ) : (
+                                <span style={{ color: '#d32f2f' }}>Inactive</span>
+                              )}
+                            </Typography>
+                          </Box>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => navigate(`/companies/${company.id}`)}
+                          >
+                            View Details
+                          </Button>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </Box>
+              )}
+            </Paper>
+          </Grid>
+
+          {/* Quick Actions */}
+          <Grid item xs={12} md={4}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Quick Actions
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Button 
+                  variant="contained" 
+                  fullWidth
+                  onClick={() => navigate('/companies')}
+                  startIcon={<BusinessIcon />}
+                >
+                  Manage Companies
+                </Button>
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    );
+  }
+
+  // Show loading state for Company Admin/HR Admin
+  if (shouldFetchAdminData && isLoadingData) {
+    return (
+      <Container maxWidth="xl">
+        <Typography variant="h4" gutterBottom>
+          Dashboard
+        </Typography>
+        <Box sx={{ textAlign: 'center', py: 4 }}>
+          <Typography variant="body1">Loading dashboard data...</Typography>
+        </Box>
+      </Container>
+    );
+  }
+
+  // Show error state with details
+  if (shouldFetchAdminData && hasDataError) {
+    const errorDetails = employeesError || payrollsError || analyticsError;
+    return (
+      <Container maxWidth="xl">
+        <Typography variant="h4" gutterBottom>
+          Dashboard
+        </Typography>
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'error.light', color: 'error.contrastText', borderRadius: 1 }}>
+          <Typography variant="body1" gutterBottom>
+            Error loading dashboard data. Please try refreshing the page.
+          </Typography>
+          {process.env.NODE_ENV === 'development' && errorDetails && (
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              Error: {errorDetails?.response?.data?.message || errorDetails?.message || 'Unknown error'}
+            </Typography>
+          )}
+        </Box>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" gutterBottom>
         Dashboard
       </Typography>
+      {(isCompanyAdmin || isHRAdmin) && (
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+          Welcome to your payroll management dashboard
+        </Typography>
+      )}
+
+      {/* Debug info in development */}
+      {process.env.NODE_ENV === 'development' && shouldFetchAdminData && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: 'info.light', borderRadius: 1, fontSize: '0.875rem' }}>
+          <Typography variant="body2">
+            Debug: Employees: {totalEmployees} | Payrolls: {payrolls.length} | 
+            Active: {activePayrolls} | Pending: {pendingPayrolls}
+          </Typography>
+        </Box>
+      )}
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mt: 2 }}>

@@ -10,7 +10,7 @@ const Loan = sequelize.define('Loan', {
   employeeId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'Employees', key: 'id' }
+    references: { model: 'employees', key: 'id' }
   },
   loanType: {
     type: DataTypes.ENUM('loan', 'advance'),
@@ -45,7 +45,7 @@ const Loan = sequelize.define('Loan', {
   },
   approvedBy: {
     type: DataTypes.UUID,
-    references: { model: 'Users', key: 'id' }
+    references: { model: 'users', key: 'id' }
   },
   approvedAt: {
     type: DataTypes.DATE
@@ -60,6 +60,36 @@ const Loan = sequelize.define('Loan', {
   paidAmount: {
     type: DataTypes.DECIMAL(12, 2),
     defaultValue: 0
+  },
+  requestDate: {
+    type: DataTypes.DATEONLY
+  },
+  requestReason: {
+    type: DataTypes.TEXT
+  },
+  requestedBy: {
+    type: DataTypes.UUID,
+    references: { model: 'users', key: 'id' }
+  },
+  rejectionReason: {
+    type: DataTypes.TEXT
+  },
+  rejectedBy: {
+    type: DataTypes.UUID,
+    references: { model: 'users', key: 'id' }
+  },
+  rejectedAt: {
+    type: DataTypes.DATE
+  },
+  emiConfiguration: {
+    type: DataTypes.JSON,
+    defaultValue: {}
+  },
+  lastDeductionDate: {
+    type: DataTypes.DATEONLY
+  },
+  nextDeductionDate: {
+    type: DataTypes.DATEONLY
   }
 }, {
   tableName: 'loans'
