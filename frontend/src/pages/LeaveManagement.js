@@ -133,7 +133,7 @@ export default function LeaveManagement() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setDialogOpen(true)}
+          onClick={() => toast.info('Leave application feature coming soon')}
         >
           Apply Leave
         </Button>

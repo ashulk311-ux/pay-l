@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Box, TextField, Button, Grid, Typography } from '@mui/material';
 
+export default function EmploymentDetailsStep({ data, onNext, onBack }) {
   const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       designation: data?.designation || '',
