@@ -287,6 +287,8 @@ See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for comprehensive deployment instructio
 - Database setup and migrations
 - Troubleshooting guide
 
+**⚠️ Important for Vercel:** See **[VERCEL_SETUP.md](./VERCEL_SETUP.md)** for critical Root Directory configuration to avoid build errors.
+
 ### Production Build (Local)
 
 ```bash

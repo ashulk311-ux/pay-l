@@ -1,0 +1,7 @@
+backend/
+database/
+scripts/
+*.md
+!README.md
+.gitignore
+node_modules/

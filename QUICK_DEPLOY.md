@@ -45,10 +45,11 @@
    - Import GitHub repo
 
 2. **Configure:**
-   - **Root Directory**: `frontend`
-   - **Framework**: Create React App
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `build`
+   - **Root Directory**: `frontend` ⚠️ **CRITICAL: Must set this!**
+   - **Framework**: Create React App (auto-detected)
+   - **Build Command**: Leave empty (uses default: `npm run build`)
+   - **Output Directory**: Leave empty (uses default: `build`)
+   - **Install Command**: Leave empty (uses default: `npm install`)
 
 3. **Set Environment Variable:**
    ```

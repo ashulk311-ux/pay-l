@@ -122,10 +122,12 @@ const sequelize = new Sequelize(
 - **Framework**: `Create React App`
 
 **Build Settings:**
-- **Root Directory**: `frontend`
-- **Build Command**: `npm run build`
-- **Output Directory**: `build`
-- **Install Command**: `npm install`
+- **Root Directory**: `frontend` ⚠️ **IMPORTANT: Set this in Vercel Dashboard**
+- **Build Command**: `npm run build` (or leave empty to use default)
+- **Output Directory**: `build` (or leave empty to use default)
+- **Install Command**: `npm install` (or leave empty to use default)
+
+**Note:** If you set Root Directory to `frontend` in Vercel dashboard, the build commands will automatically run from that directory. The `vercel.json` file will work with these settings.
 
 ### Step 3: Configure Environment Variables
 
