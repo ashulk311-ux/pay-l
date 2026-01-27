@@ -13,12 +13,9 @@ import {
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { useAuth } from '../../context/AuthContext';
-import { employeeService } from '../../services/employeeService';
 import { portalService } from '../../services/portalService';
 
 export default function EmployeeProfile() {
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const { register, handleSubmit, formState: { errors } } = useForm();
 

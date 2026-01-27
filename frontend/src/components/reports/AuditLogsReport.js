@@ -20,10 +20,10 @@ import DataTable from '../DataTable';
 export default function AuditLogsReport() {
   const [module, setModule] = useState('');
   const [action, setAction] = useState('');
-  const [entityType, setEntityType] = useState('');
+  const [entityType] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
 
   const { data: logsData, isLoading } = useQuery(
     ['auditLogs', module, action, entityType, fromDate, toDate, page],

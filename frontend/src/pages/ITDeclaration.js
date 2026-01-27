@@ -14,7 +14,7 @@ import {
   Alert
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -49,7 +49,7 @@ export default function ITDeclaration() {
     { enabled: isPortal || !!user?.employeeId }
   );
 
-  const { control, handleSubmit } = useForm({
+  const { handleSubmit } = useForm({
     defaultValues: {
       financialYear
     }

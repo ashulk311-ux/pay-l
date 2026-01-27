@@ -6,7 +6,6 @@ import {
   DialogActions,
   Button,
   Typography,
-  Box,
   Grid,
   Chip,
   Table,
@@ -21,7 +20,7 @@ import { useQuery } from 'react-query';
 import { loanService } from '../../services/loanService';
 
 export default function LoanDetailsDialog({ open, loan, onClose }) {
-  const { data: loanData, isLoading } = useQuery(
+  const { data: loanData } = useQuery(
     ['loan', loan?.id],
     () => loanService.getById(loan?.id),
     { enabled: open && !!loan?.id }

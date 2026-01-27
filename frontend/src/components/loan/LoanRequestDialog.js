@@ -35,7 +35,6 @@ export default function LoanRequestDialog({ open, onClose }) {
     }
   });
 
-  const loanType = watch('loanType');
   const amount = watch('amount');
   const interestRate = watch('interestRate');
   const tenure = watch('tenure');

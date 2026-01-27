@@ -19,7 +19,7 @@ import { useQuery } from 'react-query';
 import { reimbursementService } from '../../services/reimbursementService';
 
 export default function ReimbursementDetailsDialog({ open, reimbursement, onClose }) {
-  const { data: reimbursementData, isLoading } = useQuery(
+  const { data: reimbursementData } = useQuery(
     ['reimbursement', reimbursement?.id],
     () => reimbursementService.getById(reimbursement?.id),
     { enabled: open && !!reimbursement?.id }

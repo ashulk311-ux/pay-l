@@ -17,12 +17,7 @@ import {
   MenuItem,
   Checkbox,
   FormControlLabel,
-  Chip,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
+  IconButton
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
@@ -44,8 +39,6 @@ import { countryService } from '../services/countryService';
 import { stateService } from '../services/stateService';
 import { cityService } from '../services/cityService';
 import { useDropzone } from 'react-dropzone';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import Divider from '@mui/material/Divider';
 
 const steps = [
@@ -69,7 +62,7 @@ export default function EmployeeForm() {
   const [activeStep, setActiveStep] = useState(0);
   const [documents, setDocuments] = useState([]);
 
-  const { register, handleSubmit, control, formState: { errors }, setValue, watch, reset } = useForm({
+  const { handleSubmit, control, formState: { errors }, setValue, watch } = useForm({
     defaultValues: {
       // Basic Information
       salutation: 'Mr.',

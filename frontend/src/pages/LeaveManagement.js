@@ -4,14 +4,11 @@ import {
   Typography,
   Box,
   Button,
-  Paper,
-  Chip,
   IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -27,7 +24,6 @@ import DataTable from '../components/DataTable';
 
 export default function LeaveManagement() {
   const queryClient = useQueryClient();
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [filters, setFilters] = useState({

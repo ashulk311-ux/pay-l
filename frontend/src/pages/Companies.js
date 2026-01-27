@@ -157,7 +157,6 @@ export default function Companies() {
   };
 
   const companies = companiesData?.data || [];
-  const companyAdminRole = rolesData?.data?.find(r => r.name === 'Company Admin');
 
   const columns = [
     { field: 'name', header: 'Company Name', minWidth: 200 },

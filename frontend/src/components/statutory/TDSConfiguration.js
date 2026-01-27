@@ -1,24 +1,14 @@
 import React, { useState } from 'react';
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Typography, FormControlLabel, Switch, Chip, RadioGroup, Radio, FormLabel, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, FormControlLabel, RadioGroup, Radio, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { statutoryService } from '../../services/statutoryService';
-import DataTable from '../DataTable';
 
 export default function TDSConfiguration({ company }) {
   const queryClient = useQueryClient();
   const [slabsDialogOpen, setSlabsDialogOpen] = useState(false);
   const [exemptionsDialogOpen, setExemptionsDialogOpen] = useState(false);
-
-  const { data: configsData, isLoading } = useQuery(
-    ['statutoryConfigs', company?.id, 'TDS'],
-    () => statutoryService.getConfigurations(company?.id, { statutoryType: 'TDS' }),
-    { enabled: !!company?.id, refetchOnWindowFocus: false }
-  );
 
   const { data: slabsData } = useQuery(
     ['tdsSlabs', company?.id],
@@ -32,14 +22,14 @@ export default function TDSConfiguration({ company }) {
     { enabled: !!company?.id, refetchOnWindowFocus: false }
   );
 
-  const { control: slabsControl, handleSubmit: handleSlabsSubmit, reset: resetSlabs } = useForm({
+  const { control: slabsControl, handleSubmit: handleSlabsSubmit } = useForm({
     defaultValues: {
       regime: 'new',
       slabs: slabsData?.data?.slabs || []
     }
   });
 
-  const { control: exemptionsControl, handleSubmit: handleExemptionsSubmit, reset: resetExemptions } = useForm({
+  const { handleSubmit: handleExemptionsSubmit } = useForm({
     defaultValues: {
       exemptions: exemptionsData?.data || []
     }
@@ -73,7 +63,6 @@ export default function TDSConfiguration({ company }) {
     }
   );
 
-  const configs = configsData?.data || [];
   const slabs = slabsData?.data?.slabs || [];
   const exemptions = exemptionsData?.data || [];
 

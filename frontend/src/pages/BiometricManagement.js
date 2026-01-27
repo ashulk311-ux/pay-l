@@ -9,34 +9,23 @@ import {
   Button,
   Chip,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  MenuItem,
   Grid,
   Card,
   CardContent,
   Alert,
-  CircularProgress,
   Tooltip
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import SyncIcon from '@mui/icons-material/Sync';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { biometricService } from '../services/biometricService';
-import { employeeService } from '../services/employeeService';
-import { branchService } from '../services/branchService';
 import DataTable from '../components/DataTable';
 import DeviceDialog from '../components/biometric/DeviceDialog';
 import EmployeeMappingDialog from '../components/biometric/EmployeeMappingDialog';

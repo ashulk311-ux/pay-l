@@ -16,8 +16,6 @@ import {
   Chip,
   IconButton,
   Paper,
-  Checkbox,
-  FormControlLabel,
   List,
   ListItem,
   ListItemText,
@@ -27,16 +25,13 @@ import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { reportService } from '../../services/reportService';
-import DataTable from '../DataTable';
 
 export default function CustomReportBuilder() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedReport, setSelectedReport] = useState(null);
 
   const { data: reportsData } = useQuery('customReports', () => reportService.getCustomReports());
 

@@ -13,7 +13,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  Chip,
   Tabs,
   Tab
 } from '@mui/material';
@@ -42,7 +41,7 @@ export default function IncomeTaxSlabsManagement() {
     }
   );
 
-  const { control, handleSubmit, reset, formState: { errors }, watch } = useForm({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       taxRegime: 'new',
       slabType: 'individual',
@@ -55,7 +54,6 @@ export default function IncomeTaxSlabsManagement() {
     }
   });
 
-  const watchedRegime = watch('taxRegime');
 
   const createMutation = useMutation(
     (data) => statutoryService.createIncomeTaxSlab(data),

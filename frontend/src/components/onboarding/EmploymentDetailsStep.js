@@ -1,15 +1,6 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Box, TextField, Button, Grid, Typography, MenuItem } from '@mui/material';
-import { useQuery } from 'react-query';
-import { branchService } from '../../services/branchService';
-import { departmentService } from '../../services/departmentService';
-import { designationService } from '../../services/designationService';
-
-export default function EmploymentDetailsStep({ data, onNext, onBack }) {
-  const { data: branches } = useQuery('branches', () => branchService.getAll(), { enabled: false });
-  const { data: departments } = useQuery('departments', () => departmentService.getAll(), { enabled: false });
-  const { data: designations } = useQuery('designations', () => designationService.getAll(), { enabled: false });
+import { Box, TextField, Button, Grid, Typography } from '@mui/material';
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {

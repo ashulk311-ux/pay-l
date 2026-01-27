@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Typography,
   Button,
   Box,
-  Chip,
   IconButton,
   Menu,
   MenuItem,
@@ -12,7 +11,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Select,
   FormControl,
   InputLabel
@@ -41,7 +39,7 @@ export default function EmployeeList() {
     status: ''
   });
 
-  const { data, isLoading, error } = useQuery(
+  const { data, isLoading } = useQuery(
     ['employees', filters],
     () => employeeService.getAll(filters),
     { refetchOnWindowFocus: false }

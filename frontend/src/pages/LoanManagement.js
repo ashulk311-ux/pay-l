@@ -7,12 +7,6 @@ import {
   Tabs,
   Tab,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  MenuItem,
   Chip,
   IconButton,
   Grid,
@@ -20,15 +14,12 @@ import {
   CardContent,
   Alert
 } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { useForm, Controller } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { useQuery } from 'react-query';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { loanService } from '../services/loanService';
-import { employeeService } from '../services/employeeService';
 import DataTable from '../components/DataTable';
 import LoanRequestDialog from '../components/loan/LoanRequestDialog';
 import LoanApprovalDialog from '../components/loan/LoanApprovalDialog';

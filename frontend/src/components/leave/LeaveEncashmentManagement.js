@@ -40,7 +40,7 @@ export default function LeaveEncashmentManagement() {
     { enabled: false }
   );
 
-  const { control, handleSubmit, reset, watch } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       leaveTypeId: '',
       minBalance: 0,

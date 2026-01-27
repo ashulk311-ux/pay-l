@@ -12,8 +12,7 @@ import {
   FormControlLabel,
   Switch,
   Chip,
-  Grid,
-  Paper
+  Grid
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useForm, Controller } from 'react-hook-form';
