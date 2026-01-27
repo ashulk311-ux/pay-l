@@ -6,13 +6,12 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Button,
   Typography,
   Box,
   CircularProgress,
   Alert
 } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 import { toast } from 'react-toastify';
 import { onboardingService } from '../services/onboardingService';
 import PersonalInfoStep from '../components/onboarding/PersonalInfoStep';

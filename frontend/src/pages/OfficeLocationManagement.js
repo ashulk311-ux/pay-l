@@ -23,7 +23,6 @@ import { toast } from 'react-toastify';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { officeLocationService } from '../services/officeLocationService';
 import { branchService } from '../services/branchService';
 import DataTable from '../components/DataTable';

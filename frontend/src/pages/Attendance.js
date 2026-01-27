@@ -4,32 +4,19 @@ import {
   Typography,
   Box,
   Button,
-  Paper,
-  Grid,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   IconButton
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import AddIcon from '@mui/icons-material/Add';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { attendanceService } from '../services/attendanceService';
 import DataTable from '../components/DataTable';
 
 export default function Attendance() {
   const queryClient = useQueryClient();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedAttendance, setSelectedAttendance] = useState(null);
   const [filters, setFilters] = useState({
     employeeId: '',
     startDate: '',
@@ -117,7 +104,7 @@ export default function Attendance() {
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => setDialogOpen(true)}
+            onClick={() => toast.info('Add record feature coming soon')}
           >
             Add Record
           </Button>
