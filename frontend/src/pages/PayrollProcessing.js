@@ -15,7 +15,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -35,7 +34,6 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import LockIcon from '@mui/icons-material/Lock';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DownloadIcon from '@mui/icons-material/Download';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { payrollService } from '../services/payrollService';
 import DataTable from '../components/DataTable';
 
@@ -48,7 +46,7 @@ export default function PayrollProcessing() {
   const [selectedPayroll, setSelectedPayroll] = useState(null);
   const [processDialogOpen, setProcessDialogOpen] = useState(false);
 
-  const { data: payrollsData, isLoading } = useQuery(
+  const { data: payrollsData } = useQuery(
     'payrolls',
     () => payrollService.getAll(),
     { refetchOnWindowFocus: false }

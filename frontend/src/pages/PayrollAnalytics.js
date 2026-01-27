@@ -17,9 +17,6 @@ import {
   Line,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -28,8 +25,6 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { analyticsService } from '../services/analyticsService';
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export default function PayrollAnalytics() {
   const [year, setYear] = useState(new Date().getFullYear());

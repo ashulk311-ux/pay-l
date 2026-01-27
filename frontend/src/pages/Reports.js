@@ -15,16 +15,12 @@ import {
   Tabs,
   Tab,
   TextField,
-  Chip,
   Alert,
   CircularProgress
 } from '@mui/material';
-import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import DownloadIcon from '@mui/icons-material/Download';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import HistoryIcon from '@mui/icons-material/History';
-import AssessmentIcon from '@mui/icons-material/Assessment';
 import { reportService } from '../services/reportService';
 import DataTable from '../components/DataTable';
 import EmployeeHistoryReport from '../components/reports/EmployeeHistoryReport';
