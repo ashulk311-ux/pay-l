@@ -37,7 +37,7 @@ export default function NewsPolicyManagement() {
     retry: 1
   });
 
-  const { control, handleSubmit, reset, watch, formState: { errors } } = useForm({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       type: 'news',
       title: '',
@@ -48,8 +48,6 @@ export default function NewsPolicyManagement() {
       isActive: true
     }
   });
-
-  const sendNotification = watch('sendNotification');
 
   const createMutation = useMutation(
     (data) => newsPolicyService.create(data),

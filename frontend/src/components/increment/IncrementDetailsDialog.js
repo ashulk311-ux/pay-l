@@ -16,11 +16,10 @@ import {
   StepContent
 } from '@mui/material';
 import { useQuery } from 'react-query';
-import HistoryIcon from '@mui/icons-material/History';
 import { incrementService } from '../../services/incrementService';
 
 export default function IncrementDetailsDialog({ open, increment, onClose }) {
-  const { data: incrementData, isLoading } = useQuery(
+  const { data: incrementData } = useQuery(
     ['increment', increment?.id],
     () => incrementService.getById(increment?.id),
     { enabled: open && !!increment?.id }

@@ -63,7 +63,7 @@ export default function CityManagement() {
       setSelectedCountryId(watchedCountryId);
       reset({ ...watch(), stateId: '' }); // Reset state when country changes
     }
-  }, [watchedCountryId]);
+  }, [watchedCountryId, reset, watch]);
 
   const createMutation = useMutation(
     (data) => cityService.create(data),

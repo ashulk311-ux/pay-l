@@ -13,9 +13,7 @@ import {
   MenuItem,
   FormControlLabel,
   Switch,
-  Grid,
-  Divider,
-  Alert
+  Grid
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -41,7 +39,7 @@ export default function CompanySettings({ company }) {
     { enabled: !!company?.id, refetchOnWindowFocus: false }
   );
 
-  const settings = settingsData?.data || {};
+  const settings = React.useMemo(() => settingsData?.data || {}, [settingsData]);
 
   // Bank Details Form
   const bankDetailsForm = useForm({
@@ -380,7 +378,7 @@ export default function CompanySettings({ company }) {
     if (settings.passwordPolicy) {
       passwordPolicyForm.reset(settings.passwordPolicy);
     }
-  }, [settings]);
+  }, [settings, customMessagesForm, employeeParametersForm, mailParametersForm, attendanceParametersForm, salaryParametersForm, otherSettingsForm, passwordPolicyForm]);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
