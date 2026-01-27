@@ -274,7 +274,20 @@ npm test
 
 ## 🚢 Deployment
 
-### Production Build
+### Quick Deploy to Render (Backend) + Vercel (Frontend)
+
+See **[QUICK_DEPLOY.md](./QUICK_DEPLOY.md)** for a 10-minute deployment guide.
+
+### Detailed Deployment Guide
+
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for comprehensive deployment instructions including:
+- Render backend setup
+- Vercel frontend setup
+- Environment variable configuration
+- Database setup and migrations
+- Troubleshooting guide
+
+### Production Build (Local)
 
 ```bash
 # Build frontend
@@ -286,9 +299,15 @@ cd backend
 NODE_ENV=production npm start
 ```
 
-### Docker (Optional)
+### Generate JWT Secret for Production
 
-Docker configuration can be added for containerized deployment.
+```bash
+node scripts/generate-jwt-secret.js
+```
+
+### Deployment Checklist
+
+See **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** for a complete pre and post-deployment checklist.
 
 ## 📄 License
 

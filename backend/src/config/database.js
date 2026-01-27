@@ -18,6 +18,12 @@ const sequelize = new Sequelize(
         logger.debug(msg);
       }
     },
+    dialectOptions: {
+      ssl: process.env.NODE_ENV === 'production' && process.env.DB_SSL !== 'false' ? {
+        require: true,
+        rejectUnauthorized: false
+      } : false
+    },
     pool: {
       max: 5,
       min: 0,

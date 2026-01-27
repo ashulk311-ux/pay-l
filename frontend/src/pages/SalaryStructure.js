@@ -14,7 +14,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Chip,
   Divider
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
@@ -36,13 +35,13 @@ export default function SalaryStructure() {
     { enabled: !!id }
   );
 
-  const { data: structureData, isLoading } = useQuery(
+  const { data: structureData } = useQuery(
     ['salaryStructure', id],
     () => salaryService.getSalaryStructure(id),
     { enabled: !!id }
   );
 
-  const { control, handleSubmit, reset, watch } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       effectiveDate: new Date().toISOString().split('T')[0]
     }

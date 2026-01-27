@@ -16,7 +16,6 @@ import {
   TextField,
   MenuItem,
   Grid,
-  Alert,
   LinearProgress
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
@@ -26,7 +25,6 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { supplementaryService } from '../services/supplementaryService';
 import { employeeService } from '../services/employeeService';
 import DataTable from '../components/DataTable';
@@ -168,9 +166,12 @@ export default function SupplementarySalary() {
   };
 
   // Handle both direct array and wrapped response
-  const supplementary = Array.isArray(supplementaryData) 
-    ? supplementaryData 
-    : (supplementaryData?.data || []);
+  const supplementary = React.useMemo(() => {
+    return Array.isArray(supplementaryData) 
+      ? supplementaryData 
+      : (supplementaryData?.data || []);
+  }, [supplementaryData]);
+  
   const employees = employeesData?.data || [];
   const type = useWatch({ control, name: 'type' });
 
