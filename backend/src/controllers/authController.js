@@ -127,20 +127,13 @@ exports.login = async (req, res) => {
     const errMsg = error?.message || String(error) || 'Unknown error';
     const errStack = error?.stack;
     logger.error('Login error:', errMsg, errStack ? { stack: errStack } : {});
-    // Log to stdout so Render/hosting shows it in dashboard
     console.error('[auth/login] 500:', errMsg, errStack || '');
-    const debugRequested = req.query.debug === '1' || req.get('X-Debug-Login') === '1';
-    const clientMessage =
-      process.env.NODE_ENV === 'production' && !debugRequested
-        ? 'Login failed. Please try again or contact support.'
-        : errMsg;
-    const payload = {
+    // Return actual error so you can fix 500 (e.g. missing table, DB connection, JWT)
+    res.status(500).json({
       success: false,
       message: 'Login failed',
-      error: clientMessage || 'An unexpected error occurred'
-    };
-    if (debugRequested) payload.debug = { error: errMsg, name: error?.name };
-    res.status(500).json(payload);
+      error: errMsg
+    });
   }
 };
 
