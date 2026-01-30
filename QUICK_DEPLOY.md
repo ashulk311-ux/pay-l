@@ -84,8 +84,11 @@ Your app is live at:
 - Check Render logs
 
 **500 on `/api/auth/login`?**
-- Ensure **`JWT_SECRET`** is set in Render Environment (min 16 characters). If missing, login will return 500.
-- Check Render service logs for the exact error (database, JWT, etc.)
+- **See the real error**: Call login with `?debug=1` to get the actual error in the response (e.g. `POST .../api/auth/login?debug=1` with the same body). The response will include `debug: { error: "...", name: "..." }`. Remove `?debug=1` after fixing.
+- **Database**: Set **`DATABASE_URL`** (Internal URL from Render Postgres) in the web service Environment.
+- **Tables**: Run migrations once against the production DB. If `relation "users" does not exist`, run migrations.
+- Ensure **`JWT_SECRET`** is set (min 16 characters).
+- Check Render **Logs** for `[auth/login] 500: …` to see the real error.
 
 **Frontend can't connect to API?**
 - Verify `REACT_APP_API_URL` is correct
