@@ -79,8 +79,13 @@ Your app is live at:
 
 **Backend won't start?**
 - Check database credentials
+- **Set `JWT_SECRET`** (required, min 16 chars) — missing it causes startup to fail with a clear message
 - Verify SSL is enabled in database config
 - Check Render logs
+
+**500 on `/api/auth/login`?**
+- Ensure **`JWT_SECRET`** is set in Render Environment (min 16 characters). If missing, login will return 500.
+- Check Render service logs for the exact error (database, JWT, etc.)
 
 **Frontend can't connect to API?**
 - Verify `REACT_APP_API_URL` is correct

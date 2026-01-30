@@ -7,6 +7,12 @@ const rateLimit = require('express-rate-limit');
 // Load environment variables FIRST before requiring database config
 dotenv.config();
 
+// Fail fast if required env vars are missing (prevents 500 on login on Render etc.)
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 16) {
+  console.error('FATAL: JWT_SECRET must be set and at least 16 characters. Set it in Environment (e.g. Render dashboard).');
+  process.exit(1);
+}
+
 const { sequelize } = require('./config/database');
 const logger = require('./utils/logger');
 const { sanitizeBody, sanitizeQuery, sanitizeParams } = require('./utils/sanitize');
@@ -58,17 +64,18 @@ app.use(cors({
 }));
 
 // Rate limiting - stricter for auth endpoints
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100,
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
+  windowMs: RATE_LIMIT_WINDOW_MS,
+  max: parseInt(process.env.AUTH_RATE_LIMIT_MAX, 10) || 20, // 20 failed attempts per 15 min (successful logins don't count)
   message: 'Too many authentication attempts, please try again later.',
   skipSuccessfulRequests: true
 });

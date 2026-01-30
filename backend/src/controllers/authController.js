@@ -3,9 +3,15 @@ const { User, Role } = require('../models');
 const logger = require('../utils/logger');
 const { createAuditLog } = require('../utils/auditLogger');
 
-// Generate JWT token
+// Generate JWT token (JWT_SECRET validated at server startup)
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    const err = new Error('JWT_SECRET is not configured');
+    logger.error(err.message);
+    throw err;
+  }
+  return jwt.sign({ userId }, secret, {
     expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };
@@ -98,6 +104,11 @@ exports.login = async (req, res) => {
       entityId: user.id
     });
 
+    // Send plain objects only (avoid Sequelize serialization issues)
+    const roleData = user.role
+      ? { id: user.role.id, name: user.role.name }
+      : null;
+
     res.json({
       success: true,
       message: 'Login successful',
@@ -107,14 +118,21 @@ exports.login = async (req, res) => {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
-          role: user.role
+          role: roleData
         },
         token
       }
     });
   } catch (error) {
-    logger.error('Login error:', error);
-    res.status(500).json({ success: false, message: 'Login failed', error: error.message });
+    const errMsg = error?.message || String(error) || 'Unknown error';
+    const errStack = error?.stack;
+    logger.error('Login error:', errMsg, errStack ? { stack: errStack } : {});
+    // Log to stdout so Render/hosting shows it in dashboard
+    console.error('[auth/login] 500:', errMsg, errStack || '');
+    const clientMessage = process.env.NODE_ENV === 'production'
+      ? 'Login failed. Please try again or contact support.'
+      : errMsg;
+    res.status(500).json({ success: false, message: 'Login failed', error: clientMessage || 'An unexpected error occurred' });
   }
 };
 
