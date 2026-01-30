@@ -66,7 +66,7 @@ export default function CompanyManagement() {
     // Listen for custom event when navigating from submenu
     window.addEventListener('companyManagementTabChange', handleTabChange);
     return () => window.removeEventListener('companyManagementTabChange', handleTabChange);
-  }, []);
+  }, [tabValue]);
 
   const { data: companyData, isLoading } = useQuery(
     'myCompany',
